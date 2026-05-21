@@ -15,12 +15,36 @@
       <button
         mat-icon-button
         type="button"
-        [attr.aria-label]="auth.isAuthorized() ? 'User profile' : 'Sign in'"
+        [matMenuTriggerFor]="userMenu"
+        [attr.aria-label]="auth.isAuthorized() ? 'User menu' : 'Sign in menu'"
       >
         <mat-icon fontSet="material-symbols-outlined">
           {{ auth.isAuthorized() ? 'account_circle' : 'person' }}
         </mat-icon>
       </button>
+
+      <mat-menu #userMenu="matMenu">
+        @if (auth.isAuthorized()) {
+        <div class="rp-user-menu__info">
+          <span class="rp-user-menu__label">Signed in as</span>
+          <span class="rp-user-menu__email">{{ auth.user()?.email }}</span>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item type="button" (click)="signOut()">
+          <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
+          <span>Sign out</span>
+        </button>
+        } @else {
+        <a mat-menu-item routerLink="/auth/login">
+          <mat-icon fontSet="material-symbols-outlined">login</mat-icon>
+          <span>Sign in</span>
+        </a>
+        <a mat-menu-item routerLink="/auth/register">
+          <mat-icon fontSet="material-symbols-outlined">person_add</mat-icon>
+          <span>Create account</span>
+        </a>
+        }
+      </mat-menu>
 
       <a
         mat-icon-button
