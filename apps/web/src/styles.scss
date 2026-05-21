@@ -1,1 +1,54 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$rose-palette,
+        tertiary: mat.$green-palette,
+        theme-type: light,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+:root {
+  --rp-fg: var(--mat-sys-on-surface);
+  --rp-muted-fg: var(--mat-sys-on-surface-variant);
+
+  --rp-card-bg: var(--mat-sys-surface);
+  --rp-card-fg: var(--mat-sys-on-surface);
+  --rp-card-shadow: var(--mat-sys-level1);
+
+  --rp-skeleton-bg: var(--mat-sys-surface-container-high);
+  --rp-skeleton-radius: 8px;
+
+  --rp-accent-bg: var(--mat-sys-primary);
+  --rp-accent-fg: var(--mat-sys-primary);
+  --rp-accent-fg-on: var(--mat-sys-on-primary);
+
+  --rp-border: var(--mat-sys-outline-variant);
+  --rp-hover-bg: var(--mat-sys-surface-container-high);
+
+  --rp-danger-fg: var(--mat-sys-on-error-container);
+  --rp-danger-bg: rgba(0, 0, 0, 0.7);
+  --rp-danger-bg-soft: var(--mat-sys-error-container);
+
+  --rp-radius: 12px;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+  font-family: var(--mat-sys-body-medium-font, Roboto, system-ui, sans-serif);
+}

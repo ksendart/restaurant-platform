@@ -57,6 +57,9 @@
   font-size: 14px;
   color: var(--rp-muted-fg, #6b7280);
   line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .price {
