@@ -35,3 +35,8 @@ export interface OrderDto {
   status: OrderStatus;
   createdAt: string;
 }
+
+export interface OrderStreamEvent {
+  id: string;
+  status: OrderStatus;
+}

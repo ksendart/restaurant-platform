@@ -1,16 +1,27 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { OrderDto } from '@restaurant-platform/shared-types';
+import { OrderDto, OrderStatus } from '@restaurant-platform/shared-types';
 import { Dish } from '../menu/dish.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
+import {
+  ORDER_STATUS_CHANGED,
+  OrderStatusChangedEvent,
+} from './events/order-status-changed.event';
 import { Order, OrderDocument } from './order.schema';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
-    @InjectModel(Dish.name) private readonly dishModel: Model<Dish>
+    @InjectModel(Dish.name) private readonly dishModel: Model<Dish>,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   async create(userId: string, dto: CreateOrderDto): Promise<OrderDto> {
@@ -45,7 +56,56 @@ export class OrdersService {
       total,
     });
 
-    return toDto(created);
+    const dto2 = toDto(created);
+    this.eventEmitter.emit(
+      ORDER_STATUS_CHANGED,
+      new OrderStatusChangedEvent(dto2.id, userId, dto2.status)
+    );
+    return dto2;
+  }
+
+  async updateStatus(orderId: string, status: OrderStatus): Promise<OrderDto> {
+    if (!Types.ObjectId.isValid(orderId)) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+
+    const updated = await this.orderModel
+      .findByIdAndUpdate(orderId, { status }, { new: true })
+      .exec();
+
+    if (!updated) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+
+    const dto = toDto(updated);
+    this.eventEmitter.emit(
+      ORDER_STATUS_CHANGED,
+      new OrderStatusChangedEvent(dto.id, String(updated.userId), dto.status)
+    );
+    return dto;
+  }
+
+  async findAllForUser(userId: string): Promise<OrderDto[]> {
+    const docs = await this.orderModel
+      .find({ userId: new Types.ObjectId(userId) })
+      .sort({ createdAt: -1 })
+      .exec();
+    return docs.map(toDto);
+  }
+
+  async findOneForUser(orderId: string, userId: string): Promise<OrderDto> {
+    if (!Types.ObjectId.isValid(orderId)) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+
+    const doc = await this.orderModel.findById(orderId).exec();
+    if (!doc) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+    if (String(doc.userId) !== userId) {
+      throw new ForbiddenException();
+    }
+    return toDto(doc);
   }
 }
 
