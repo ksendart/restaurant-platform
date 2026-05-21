@@ -22,7 +22,6 @@ import { SseClient, SseStatus } from '@restaurant-platform/data-access-sse';
 import { OrderDto, OrderStreamEvent } from '@restaurant-platform/shared-types';
 import {
   EMPTY,
-  Observable,
   catchError,
   debounceTime,
   filter,
@@ -105,40 +104,32 @@ export const UserOrdersStore = signalStore(
         )
       );
 
-      const subscribeToStream = rxMethod<Observable<OrderStreamEvent>>(
+      const subscribeToStream = rxMethod<OrderStreamEvent>(
         pipe(
-          switchMap((messages$) =>
-            messages$.pipe(
-              tap((event) => {
-                patchState(
-                  store,
-                  updateEntity(
-                    { id: event.id, changes: { status: event.status } },
-                    orderEntity
-                  )
-                );
-              })
-            )
-          )
+          tap((event) => {
+            patchState(
+              store,
+              updateEntity(
+                { id: event.id, changes: { status: event.status } },
+                orderEntity
+              )
+            );
+          })
         )
       );
 
-      const trackConnection = rxMethod<Observable<SseStatus>>(
+      const trackConnection = rxMethod<SseStatus>(
         pipe(
-          switchMap((status$) =>
-            status$.pipe(
-              tap((status) =>
-                patchState(store, { sseConnected: status === 'connected' })
-              ),
-              filter((status) => status === 'disconnected'),
-              debounceTime(SSE_RECONNECT_GRACE_MS),
-              filter(() => authStore.user() !== null),
-              switchMap(() =>
-                authStore.refresh().pipe(
-                  tap(() => sseClient.connect(SSE_URL)),
-                  catchError(() => EMPTY)
-                )
-              )
+          tap((status) =>
+            patchState(store, { sseConnected: status === 'connected' })
+          ),
+          filter((status) => status === 'disconnected'),
+          debounceTime(SSE_RECONNECT_GRACE_MS),
+          filter(() => authStore.user() !== null),
+          switchMap(() =>
+            authStore.refresh().pipe(
+              tap(() => sseClient.connect(SSE_URL)),
+              catchError(() => EMPTY)
             )
           )
         )

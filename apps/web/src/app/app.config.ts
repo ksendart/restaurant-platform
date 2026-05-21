@@ -7,7 +7,11 @@ import {
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { provideRouter, TitleStrategy } from '@angular/router';
+import {
+  provideRouter,
+  TitleStrategy,
+  withComponentInputBinding,
+} from '@angular/router';
 import {
   provideHttpClient,
   withFetch,
@@ -32,7 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideAnimationsAsync(),
-    provideRouter(appRoutes),
+    provideRouter(appRoutes, withComponentInputBinding()),
     { provide: TitleStrategy, useClass: RpTitleStrategy },
     provideHttpClient(
       withFetch(),
@@ -43,9 +47,9 @@ export const appConfig: ApplicationConfig = {
         return;
       }
       const authStore = inject(AuthStore);
-      await authStore.tryRestoreSession();
       inject(UserOrdersStore);
       inject(OrderNotificationsService);
+      await authStore.tryRestoreSession();
     }),
   ],
 };

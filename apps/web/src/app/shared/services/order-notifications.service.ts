@@ -3,20 +3,28 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { OrderDto, OrderStatus } from '@restaurant-platform/shared-types';
 import { UserOrdersStore } from '@restaurant-platform/state';
 
-const SNACK_DURATION_MS = 5_000;
+const SNACK_DURATION_MS = 3_000;
 
-const STATUS_MESSAGES: Partial<Record<OrderStatus, string>> = {
-  preparing: 'Your order is being prepared',
-  ready: 'Your order is ready for pickup',
-  completed: 'Order completed. Enjoy!',
-  cancelled: 'Your order was cancelled',
+const STATUS_MESSAGES: Partial<
+  Record<OrderStatus, (shortId: string) => string>
+> = {
+  preparing: (id) => `Order #${id} is being prepared`,
+  ready: (id) => `Order #${id} is ready for pickup`,
+  completed: (id) => `Order #${id} completed. Enjoy!`,
+  cancelled: (id) => `Order #${id} was cancelled`,
 };
+
+function shortOrderId(id: string): string {
+  return id.slice(-6).toUpperCase();
+}
 
 @Injectable({ providedIn: 'root' })
 export class OrderNotificationsService {
   private readonly snackBar = inject(MatSnackBar);
   private readonly userOrdersStore = inject(UserOrdersStore);
   private readonly previousStatusById = new Map<string, OrderStatus>();
+  private readonly queue: string[] = [];
+  private isShowing = false;
 
   constructor() {
     effect(() => {
@@ -27,13 +35,30 @@ export class OrderNotificationsService {
         if (previous === undefined || previous === order.status) {
           continue;
         }
-        const message = STATUS_MESSAGES[order.status];
-        if (message) {
-          this.snackBar.open(message, 'Dismiss', {
-            duration: SNACK_DURATION_MS,
-          });
+        const build = STATUS_MESSAGES[order.status];
+        if (build) {
+          this.enqueue(build(shortOrderId(order.id)));
         }
       }
     });
+  }
+
+  private enqueue(message: string): void {
+    this.queue.push(message);
+    this.showNext();
+  }
+
+  private showNext(): void {
+    if (this.isShowing) return;
+    const message = this.queue.shift();
+    if (message === undefined) return;
+    this.isShowing = true;
+    this.snackBar
+      .open(message, 'Dismiss', { duration: SNACK_DURATION_MS })
+      .afterDismissed()
+      .subscribe(() => {
+        this.isShowing = false;
+        this.showNext();
+      });
   }
 }
