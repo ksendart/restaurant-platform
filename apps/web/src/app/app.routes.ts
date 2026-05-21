@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { AuthLayout, MainLayout } from '@restaurant-platform/ui';
+import { AuthLayout, MainLayout } from '@restaurant-platform/feature-shell';
 
 export const appRoutes: Route[] = [
   {

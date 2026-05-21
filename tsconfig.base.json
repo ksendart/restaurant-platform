@@ -23,6 +23,7 @@
       ],
       "@restaurant-platform/feature-auth": ["libs/feature-auth/src/index.ts"],
       "@restaurant-platform/feature-menu": ["libs/feature-menu/src/index.ts"],
+      "@restaurant-platform/feature-shell": ["libs/feature-shell/src/index.ts"],
       "@restaurant-platform/shared-types": ["libs/shared-types/src/index.ts"],
       "@restaurant-platform/state": ["libs/state/src/index.ts"],
       "@restaurant-platform/state-features": [

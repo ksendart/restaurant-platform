@@ -15,16 +15,21 @@
       <button
         mat-icon-button
         type="button"
-        aria-label="User profile (coming soon)"
-        disabled
+        [attr.aria-label]="auth.isAuthorized() ? 'User profile' : 'Sign in'"
       >
-        <mat-icon fontSet="material-symbols-outlined">person</mat-icon>
+        <mat-icon fontSet="material-symbols-outlined">
+          {{ auth.isAuthorized() ? 'account_circle' : 'person' }}
+        </mat-icon>
       </button>
+
       <button
         mat-icon-button
         type="button"
-        aria-label="Cart (coming soon)"
-        disabled
+        aria-label="Cart"
+        [matBadge]="cart.totalCount()"
+        [matBadgeHidden]="cart.isEmpty()"
+        matBadgeColor="accent"
+        matBadgeSize="small"
       >
         <mat-icon fontSet="material-symbols-outlined">shopping_cart</mat-icon>
       </button>
