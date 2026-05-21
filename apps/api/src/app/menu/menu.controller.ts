@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ParseObjectIdPipe } from '../common/parse-object-id.pipe';
 import { MenuService } from './menu.service';
-import { DishDto } from '@restaurant/shared-types';
+import { DishDto } from '@restaurant-platform/shared-types';
 
 @Controller('menu')
 export class MenuController {

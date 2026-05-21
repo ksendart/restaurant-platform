@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { PingResponse } from '@restaurant/shared-types';
+import { PingResponse } from '@restaurant-platform/shared-types';
 
 @Component({
-  selector: 'app-root',
+  selector: 'rp-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

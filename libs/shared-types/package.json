@@ -1,5 +1,5 @@
 {
-  "name": "@restaurant/shared-types",
+  "name": "@restaurant-platform/shared-types",
   "version": "0.0.1",
   "private": true,
   "type": "commonjs",

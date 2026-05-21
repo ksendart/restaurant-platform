@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PingResponse } from '@restaurant/shared-types';
+import { PingResponse } from '@restaurant-platform/shared-types';
 import { Ping } from './ping.schema';
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { httpResource } from '@angular/common/http';
 import { Injectable, Signal } from '@angular/core';
-import { DishDto } from '@restaurant/shared-types';
+import { DishDto } from '@restaurant-platform/shared-types';
 
 @Injectable({ providedIn: 'root' })
 export class MenuService {

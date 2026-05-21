@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { DishDto } from '@restaurant/shared-types';
+import { DishDto } from '@restaurant-platform/shared-types';
 import { Dish, DishDocument } from './dish.schema';
 
 @Injectable()

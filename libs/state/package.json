@@ -1,5 +1,5 @@
 {
-  "name": "@restaurant/state",
+  "name": "@restaurant-platform/state",
   "version": "0.0.1",
   "private": true,
   "type": "commonjs",
