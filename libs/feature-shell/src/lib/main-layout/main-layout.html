@@ -46,17 +46,83 @@
         }
       </mat-menu>
 
-      <a
+      <button
         mat-icon-button
-        routerLink="/checkout"
-        aria-label="Cart"
+        type="button"
         class="rp-header__cart"
+        [matMenuTriggerFor]="cartMenu"
+        aria-label="Cart and orders"
       >
         <mat-icon fontSet="material-symbols-outlined">shopping_cart</mat-icon>
         @if (!cart.isEmpty()) {
         <span class="rp-header__cart-badge">{{ cart.totalCount() }}</span>
         }
-      </a>
+      </button>
+
+      <mat-menu #cartMenu="matMenu" class="rp-cart-menu">
+        <div class="rp-cart-menu__section">
+          <div class="rp-cart-menu__title">Cart</div>
+          @if (cart.isEmpty()) {
+          <div class="rp-cart-menu__empty">Cart is empty</div>
+          <a mat-stroked-button routerLink="/menu">Browse menu</a>
+          } @else {
+          <ul class="rp-cart-menu__items">
+            @for (item of cartPreviewItems(); track item.dishId) {
+            <li class="rp-cart-menu__item">
+              <span class="rp-cart-menu__item-name">{{ item.name }}</span>
+              <span class="rp-cart-menu__item-count">× {{ item.count }}</span>
+            </li>
+            } @if (cartExtraCount() > 0) {
+            <li class="rp-cart-menu__more">and {{ cartExtraCount() }} more</li>
+            }
+          </ul>
+          <div class="rp-cart-menu__subtotal">
+            <span>Subtotal</span>
+            <span
+              >{{ cart.totalPrice() | currency : 'USD' : 'symbol' : '1.2-2'
+              }}</span
+            >
+          </div>
+          <a mat-flat-button color="primary" routerLink="/checkout">
+            Go to checkout
+          </a>
+          }
+        </div>
+
+        @if (auth.isAuthorized()) {
+        <mat-divider></mat-divider>
+        <div class="rp-cart-menu__section">
+          <div class="rp-cart-menu__title">My orders</div>
+          @if (activeOrders().length === 0) {
+          <div class="rp-cart-menu__empty">No active orders</div>
+          } @else {
+          <ul class="rp-cart-menu__orders">
+            @for (order of activeOrders(); track order.id) {
+            <li>
+              <a
+                class="rp-cart-menu__order"
+                [routerLink]="['/account/orders', order.id]"
+              >
+                <span class="rp-cart-menu__order-id"
+                  >#{{ shortId(order.id) }}</span
+                >
+                <span
+                  class="rp-cart-menu__order-status"
+                  [attr.data-status]="order.status"
+                >
+                  {{ order.status }}
+                </span>
+              </a>
+            </li>
+            }
+          </ul>
+          }
+          <a mat-stroked-button routerLink="/account/orders">
+            View all orders
+          </a>
+        </div>
+        }
+      </mat-menu>
     </nav>
   </header>
 
