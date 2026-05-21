@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
 import { AuthLayout, MainLayout } from '@restaurant-platform/feature-shell';
 import { authGuard } from './shared/guards/auth.guard';
+import { canDeactivateGuard } from './shared/guards/can-deactivate.guard';
 
 export const appRoutes: Route[] = [
   {
@@ -21,6 +22,7 @@ export const appRoutes: Route[] = [
       {
         path: 'checkout',
         canActivate: [authGuard],
+        canDeactivate: [canDeactivateGuard],
         loadComponent: () =>
           import('@restaurant-platform/feature-checkout').then(
             (m) => m.CheckoutPage
