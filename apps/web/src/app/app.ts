@@ -1,12 +1,11 @@
-import { Component } from '@angular/core';
-import { httpResource } from '@angular/common/http';
-import { PingResponse } from '@restaurant/shared-types';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-root',
+  selector: 'rp-root',
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {
-  protected readonly ping = httpResource<PingResponse>(() => '/api/ping');
-}
+export class App {}

@@ -1,5 +1,5 @@
 {
-  "name": "@restaurant/state-features",
+  "name": "@restaurant-platform/state-features",
   "version": "0.0.1",
   "private": true,
   "type": "commonjs",

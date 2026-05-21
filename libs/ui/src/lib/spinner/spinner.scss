@@ -1,0 +1,34 @@
+:host {
+  display: inline-block;
+  width: var(--rp-spinner-size, 32px);
+  height: var(--rp-spinner-size, 32px);
+  position: relative;
+  box-sizing: border-box;
+}
+
+:host::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: var(--rp-spinner-thickness, 3px) solid
+    var(--rp-spinner-track, rgba(0, 0, 0, 0.12));
+  border-top-color: var(--rp-spinner-color, var(--mat-sys-primary, #ba005c));
+  animation: rp-spinner-rotate 0.9s linear infinite;
+  box-sizing: border-box;
+}
+
+@keyframes rp-spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host::before {
+    animation: none;
+  }
+}

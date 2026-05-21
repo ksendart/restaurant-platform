@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  width: var(--rp-skeleton-w, 100%);
+  height: var(--rp-skeleton-h, 1em);
+  border-radius: var(--rp-skeleton-radius, 6px);
+  background: var(--rp-skeleton-bg, #e5e7eb);
+  animation: rp-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes rp-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}
