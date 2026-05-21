@@ -11,7 +11,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,6 +38,7 @@ export class LoginPage {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly status = this.authStore.status;
   protected readonly isLoading = computed(() => this.status() === 'loading');
@@ -51,7 +52,8 @@ export class LoginPage {
   constructor() {
     effect(() => {
       if (this.submitted() && this.authStore.isAuthorized()) {
-        void this.router.navigateByUrl('/menu');
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        void this.router.navigateByUrl(returnUrl ?? '/menu');
       }
     });
   }

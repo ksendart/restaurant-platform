@@ -22,9 +22,9 @@
         </mat-icon>
       </button>
 
-      <button
+      <a
         mat-icon-button
-        type="button"
+        routerLink="/checkout"
         aria-label="Cart"
         [matBadge]="cart.totalCount()"
         [matBadgeHidden]="cart.isEmpty()"
@@ -32,7 +32,7 @@
         matBadgeSize="small"
       >
         <mat-icon fontSet="material-symbols-outlined">shopping_cart</mat-icon>
-      </button>
+      </a>
     </nav>
   </header>
 

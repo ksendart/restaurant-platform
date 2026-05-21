@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { AuthLayout, MainLayout } from '@restaurant-platform/feature-shell';
+import { authGuard } from './shared/guards/auth.guard';
 
 export const appRoutes: Route[] = [
   {
@@ -16,6 +17,15 @@ export const appRoutes: Route[] = [
         loadComponent: () =>
           import('@restaurant-platform/feature-menu').then((m) => m.MenuPage),
         title: 'Menu',
+      },
+      {
+        path: 'checkout',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('@restaurant-platform/feature-checkout').then(
+            (m) => m.CheckoutPage
+          ),
+        title: 'Checkout',
       },
     ],
   },

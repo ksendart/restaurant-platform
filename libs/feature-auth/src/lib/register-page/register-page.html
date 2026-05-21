@@ -85,7 +85,7 @@
     </mat-card-content>
 
     <mat-card-actions>
-      <a mat-button routerLink="/auth/login"
+      <a mat-button routerLink="/auth/login" [queryParamsHandling]="'preserve'"
         >Already have an account? Sign in</a
       >
     </mat-card-actions>

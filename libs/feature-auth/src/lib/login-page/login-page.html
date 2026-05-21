@@ -53,7 +53,12 @@
     </mat-card-content>
 
     <mat-card-actions>
-      <a mat-button routerLink="/auth/register">Need an account? Register</a>
+      <a
+        mat-button
+        routerLink="/auth/register"
+        [queryParamsHandling]="'preserve'"
+        >Need an account? Register</a
+      >
     </mat-card-actions>
   </mat-card>
 </section>
