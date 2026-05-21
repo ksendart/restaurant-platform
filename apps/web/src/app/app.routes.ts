@@ -38,6 +38,15 @@ export const appRoutes: Route[] = [
           ),
         title: 'My orders',
       },
+      {
+        path: 'account/orders/:id',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('@restaurant-platform/feature-account').then(
+            (m) => m.OrderDetailPage
+          ),
+        title: 'Order',
+      },
     ],
   },
   {

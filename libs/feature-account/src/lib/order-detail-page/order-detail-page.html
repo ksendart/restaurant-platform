@@ -1,0 +1,107 @@
+<section class="rp-order-detail">
+  <a mat-button routerLink="/account/orders" class="rp-order-detail__back">
+    <mat-icon fontSet="material-symbols-outlined">arrow_back</mat-icon>
+    Back to orders
+  </a>
+
+  @if (loadStatus() === 'loading' && !order()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Loading order" />
+  } @else if (loadStatus() === 'not-found') {
+  <div class="rp-order-detail__empty" role="alert">
+    <mat-icon fontSet="material-symbols-outlined">search_off</mat-icon>
+    <p>Order not found.</p>
+    <a mat-flat-button color="primary" routerLink="/account/orders">
+      Back to orders
+    </a>
+  </div>
+  } @else if (loadStatus() === 'error') {
+  <div class="rp-order-detail__empty" role="alert">
+    <mat-icon fontSet="material-symbols-outlined">error</mat-icon>
+    <p>Failed to load order.</p>
+    <button mat-stroked-button type="button" (click)="retry()">Retry</button>
+  </div>
+  } @else if (order(); as o) {
+  <header class="rp-order-detail__header">
+    <div>
+      <h1>Order #{{ shortId(o.id) }}</h1>
+      <p class="rp-order-detail__created">
+        Placed on {{ o.createdAt | date : 'medium' }}
+      </p>
+    </div>
+    <span class="rp-order-detail__status" [attr.data-status]="o.status">
+      {{ o.status }}
+    </span>
+  </header>
+
+  <section class="rp-order-detail__timeline" aria-label="Order progress">
+    @switch (o.status) { @case ('cancelled') {
+    <div class="rp-order-detail__cancelled">
+      <mat-icon fontSet="material-symbols-outlined">cancel</mat-icon>
+      <span>This order was cancelled.</span>
+    </div>
+    } @default {
+    <ol class="rp-order-detail__stages">
+      @for (stage of stages; track stage.status; let i = $index) {
+      <li
+        class="rp-order-detail__stage"
+        [class.rp-order-detail__stage--done]="i < currentStageIndex()"
+        [class.rp-order-detail__stage--current]="i === currentStageIndex()"
+      >
+        <span class="rp-order-detail__stage-dot"></span>
+        <span class="rp-order-detail__stage-label">{{ stage.label }}</span>
+      </li>
+      }
+    </ol>
+    } }
+  </section>
+
+  <section class="rp-order-detail__pickup" aria-label="Pickup details">
+    <h2>Pickup</h2>
+    <p>
+      {{ o.createdAt | date : 'fullDate' }} at
+      <strong>{{ o.pickupSlot }}</strong>
+    </p>
+  </section>
+
+  <section class="rp-order-detail__items" aria-label="Items">
+    <h2>Items</h2>
+    <ul>
+      @for (item of o.items; track item.dishId) {
+      <li class="rp-order-detail__item">
+        <span class="rp-order-detail__item-name">{{ item.name }}</span>
+        <span class="rp-order-detail__item-count">× {{ item.count }}</span>
+        <span class="rp-order-detail__item-price">
+          {{ item.price * item.count | currency : 'USD' : 'symbol' : '1.2-2' }}
+        </span>
+      </li>
+      }
+    </ul>
+    <div class="rp-order-detail__total">
+      <span>Total</span>
+      <span> {{ o.total | currency : 'USD' : 'symbol' : '1.2-2' }} </span>
+    </div>
+  </section>
+
+  <section class="rp-order-detail__contact" aria-label="Contact">
+    <h2>Contact</h2>
+    <dl>
+      <dt>Name</dt>
+      <dd>{{ o.contact.name }}</dd>
+      <dt>Phone</dt>
+      <dd>{{ o.contact.phone }}</dd>
+      <dt>Email</dt>
+      <dd>{{ o.contact.email }}</dd>
+    </dl>
+  </section>
+
+  <div class="rp-order-detail__sse">
+    <mat-icon fontSet="material-symbols-outlined">
+      {{ sseConnected() ? 'wifi' : 'wifi_off' }}
+    </mat-icon>
+    <span
+      >{{ sseConnected() ? 'Live updates connected' : 'Live updates offline'
+      }}</span
+    >
+  </div>
+  }
+</section>
