@@ -1,0 +1,89 @@
+<section class="rp-orders">
+  <header class="rp-orders__header">
+    <div class="rp-orders__heading">
+      <h1>My orders</h1>
+      <span
+        class="rp-orders__sse"
+        [class.rp-orders__sse--off]="!sseConnected()"
+        [attr.aria-label]="
+          sseConnected() ? 'Live updates connected' : 'Live updates offline'
+        "
+      >
+        <mat-icon fontSet="material-symbols-outlined">
+          {{ sseConnected() ? 'wifi' : 'wifi_off' }}
+        </mat-icon>
+        <span class="rp-orders__sse-text">
+          {{ sseConnected() ? 'Live' : 'Offline' }}
+        </span>
+      </span>
+    </div>
+
+    <mat-chip-listbox
+      class="rp-orders__filters"
+      [value]="filter()"
+      (change)="onFilterChange($event)"
+      aria-label="Order status filter"
+    >
+      @for (option of filterOptions; track option.value) {
+      <mat-chip-option [value]="option.value"
+        >{{ option.label }}</mat-chip-option
+      >
+      }
+    </mat-chip-listbox>
+  </header>
+
+  @if (status() === 'loading') {
+  <mat-progress-bar mode="indeterminate" aria-label="Loading orders" />
+  } @else if (status() === 'error') {
+  <div class="rp-orders__error" role="alert">
+    <mat-icon fontSet="material-symbols-outlined">error</mat-icon>
+    <p>{{ lastError() ?? 'Failed to load orders.' }}</p>
+    <button mat-stroked-button type="button" (click)="retry()">Retry</button>
+  </div>
+  } @else if (filteredOrders().length === 0) {
+  <div class="rp-orders__empty">
+    <mat-icon fontSet="material-symbols-outlined">receipt_long</mat-icon>
+    <p>No orders here yet.</p>
+    <a mat-flat-button color="primary" routerLink="/menu">Browse menu</a>
+  </div>
+  } @else {
+  <ul class="rp-orders__list">
+    @for (order of pagedOrders(); track order.id) {
+    <li class="rp-orders__item">
+      <a
+        class="rp-order-card"
+        [routerLink]="['/account/orders', order.id]"
+        [attr.aria-label]="'Order ' + shortId(order.id)"
+      >
+        <div class="rp-order-card__top">
+          <span class="rp-order-card__id">#{{ shortId(order.id) }}</span>
+          <span class="rp-order-card__status" [attr.data-status]="order.status">
+            {{ order.status }}
+          </span>
+        </div>
+        <div class="rp-order-card__body">
+          <span class="rp-order-card__items">{{ itemsSummary(order) }}</span>
+          <span class="rp-order-card__pickup">
+            Pickup on {{ order.createdAt | date : 'mediumDate' }} at {{
+            order.pickupSlot }}
+          </span>
+        </div>
+        <div class="rp-order-card__total">
+          {{ order.total | currency : 'USD' : 'symbol' : '1.2-2' }}
+        </div>
+      </a>
+    </li>
+    }
+  </ul>
+
+  @if (totalPages() > 1) {
+  <mat-paginator
+    [length]="filteredOrders().length"
+    [pageSize]="pageSize"
+    [pageIndex]="currentPage() - 1"
+    [hidePageSize]="true"
+    (page)="onPage($event)"
+    aria-label="Orders pagination"
+  />
+  } }
+</section>
