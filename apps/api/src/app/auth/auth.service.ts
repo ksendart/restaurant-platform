@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { createHash, randomUUID, timingSafeEqual } from 'crypto';
-import { UserRole } from '@restaurant-platform/shared-types';
+import { AuthUser, UserRole } from '@restaurant-platform/shared-types';
 import { UsersService } from '../users/users.service';
 import { UserDocument } from '../users/user.schema';
 import { RegisterDto } from './dto/register.dto';
@@ -24,13 +24,6 @@ export interface AuthTokens {
   refreshToken: string;
 }
 
-export interface AuthUserView {
-  id: string;
-  email: string;
-  role: UserRole;
-  name?: string;
-}
-
 const BCRYPT_ROUNDS = 10;
 const MONGO_DUPLICATE_KEY = 11000;
 
@@ -43,7 +36,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<{
-    user: AuthUserView;
+    user: AuthUser;
     tokens: AuthTokens;
   }> {
     const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
@@ -68,7 +61,7 @@ export class AuthService {
   }
 
   async login(dto: LoginDto): Promise<{
-    user: AuthUserView;
+    user: AuthUser;
     tokens: AuthTokens;
   }> {
     const user = await this.usersService.findByEmailWithPassword(dto.email);
@@ -87,7 +80,7 @@ export class AuthService {
   }
 
   async refresh(presentedRefreshToken: string): Promise<{
-    user: AuthUserView;
+    user: AuthUser;
     tokens: AuthTokens;
   }> {
     let payload: JwtPayload;
@@ -188,7 +181,7 @@ export class AuthService {
     return timingSafeEqual(presentedHash, storedHash);
   }
 
-  private toView(user: UserDocument): AuthUserView {
+  private toView(user: UserDocument): AuthUser {
     return {
       id: user.id,
       email: user.email,

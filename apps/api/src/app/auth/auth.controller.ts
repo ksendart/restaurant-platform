@@ -11,7 +11,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
-import { AuthService, AuthTokens, AuthUserView } from './auth.service';
+import { AuthUser } from '@restaurant-platform/shared-types';
+import { AuthService, AuthTokens } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -31,7 +32,7 @@ export class AuthController {
   async register(
     @Body() dto: RegisterDto,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ user: AuthUserView; accessToken: string }> {
+  ): Promise<{ user: AuthUser; accessToken: string }> {
     const { user, tokens } = await this.authService.register(dto);
     this.setRefreshCookie(res, tokens);
     return { user, accessToken: tokens.accessToken };
@@ -42,7 +43,7 @@ export class AuthController {
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ user: AuthUserView; accessToken: string }> {
+  ): Promise<{ user: AuthUser; accessToken: string }> {
     const { user, tokens } = await this.authService.login(dto);
     this.setRefreshCookie(res, tokens);
     return { user, accessToken: tokens.accessToken };
@@ -53,7 +54,7 @@ export class AuthController {
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ user: AuthUserView; accessToken: string }> {
+  ): Promise<{ user: AuthUser; accessToken: string }> {
     const refreshToken = req.cookies?.[REFRESH_COOKIE];
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token');
