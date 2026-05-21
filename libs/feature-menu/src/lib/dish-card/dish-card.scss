@@ -14,6 +14,20 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.media img.is-loaded {
+  opacity: 1;
+}
+
+.media-spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 32px;
+  height: 32px;
 }
 
 .media-fallback {

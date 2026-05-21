@@ -39,9 +39,14 @@
   <section class="category-section">
     <h2 class="category-title">{{ labelFor(section.category) }}</h2>
     <div class="grid">
-      @for (dish of section.dishes; track dish.id) {
+      @for (dish of section.dishes; track dish.id) { @defer (hydrate on
+      viewport) {
       <rp-dish-card [dish]="dish" />
-      }
+      } @placeholder {
+      <rp-skeleton
+        style="--rp-skeleton-h: 280px; --rp-skeleton-radius: 12px"
+      ></rp-skeleton>
+      } }
     </div>
   </section>
   } @empty {

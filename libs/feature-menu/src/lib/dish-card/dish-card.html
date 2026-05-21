@@ -4,10 +4,14 @@
     <img
       [src]="dish().imageUrl"
       [alt]="dish().name"
+      [class.is-loaded]="imageLoaded()"
       loading="lazy"
+      (load)="onImageLoad()"
       (error)="onImageError()"
     />
-    } @else {
+    @if (!imageLoaded()) {
+    <rp-spinner class="media-spinner"></rp-spinner>
+    } } @else {
     <div class="media-fallback" aria-hidden="true">
       <svg
         viewBox="0 0 24 24"
