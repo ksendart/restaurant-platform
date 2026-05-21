@@ -77,10 +77,30 @@
 }
 
 .price {
-  margin-top: 4px;
   font-size: 18px;
   font-weight: 700;
   color: var(--rp-accent-fg, #111);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.qty-count {
+  min-width: 24px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 :host(.is-sold-out) {

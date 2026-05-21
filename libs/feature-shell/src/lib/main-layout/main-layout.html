@@ -26,12 +26,12 @@
         mat-icon-button
         routerLink="/checkout"
         aria-label="Cart"
-        [matBadge]="cart.totalCount()"
-        [matBadgeHidden]="cart.isEmpty()"
-        matBadgeColor="accent"
-        matBadgeSize="small"
+        class="rp-header__cart"
       >
         <mat-icon fontSet="material-symbols-outlined">shopping_cart</mat-icon>
+        @if (!cart.isEmpty()) {
+        <span class="rp-header__cart-badge">{{ cart.totalCount() }}</span>
+        }
       </a>
     </nav>
   </header>
