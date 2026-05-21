@@ -7,7 +7,7 @@ import {
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { provideRouter } from '@angular/router';
+import { provideRouter, TitleStrategy } from '@angular/router';
 import {
   provideHttpClient,
   withFetch,
@@ -23,6 +23,7 @@ import { AuthStore } from '@restaurant-platform/state';
 import { appRoutes } from './app.routes';
 import { authInterceptor } from './shared/interceptors/auth.interceptor';
 import { errorInterceptor } from './shared/interceptors/error.interceptor';
+import { RpTitleStrategy } from './shared/title-strategy';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,6 +32,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideAnimationsAsync(),
     provideRouter(appRoutes),
+    { provide: TitleStrategy, useClass: RpTitleStrategy },
     provideHttpClient(
       withFetch(),
       withInterceptors([authInterceptor, errorInterceptor])

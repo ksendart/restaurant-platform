@@ -1,0 +1,43 @@
+<div class="rp-main-layout">
+  <header class="rp-header">
+    <a
+      class="rp-header__brand"
+      routerLink="/menu"
+      aria-label="Restaurant Platform — home"
+    >
+      <mat-icon class="rp-header__logo" fontSet="material-symbols-outlined"
+        >dining</mat-icon
+      >
+      <span class="rp-header__title">Restaurant Platform</span>
+    </a>
+
+    <nav class="rp-header__actions" aria-label="User navigation">
+      <button
+        mat-icon-button
+        type="button"
+        aria-label="User profile (coming soon)"
+        disabled
+      >
+        <mat-icon fontSet="material-symbols-outlined">person</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        type="button"
+        aria-label="Cart (coming soon)"
+        disabled
+      >
+        <mat-icon fontSet="material-symbols-outlined">shopping_cart</mat-icon>
+      </button>
+    </nav>
+  </header>
+
+  <main class="rp-main">
+    <router-outlet />
+  </main>
+
+  <footer class="rp-footer">
+    <span>Restaurant Platform</span>
+    <span>Ksenya Arysheva</span>
+    <span>{{ currentYear }}</span>
+  </footer>
+</div>

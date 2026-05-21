@@ -13,6 +13,11 @@
 .auth-card {
   width: 100%;
   max-width: 420px;
+  box-shadow: var(--rp-card-shadow);
+
+  ::ng-deep .mat-mdc-card-title {
+    color: var(--mat-sys-primary);
+  }
 
   ::ng-deep .mat-mdc-card-content {
     padding: 16px;

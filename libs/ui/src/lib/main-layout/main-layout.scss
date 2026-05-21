@@ -1,0 +1,80 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.rp-main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.rp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding: 0 24px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  box-shadow: var(--mat-sys-level2);
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  &__logo {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+  }
+
+  &__title {
+    font-size: 22px;
+    letter-spacing: 0.3px;
+  }
+
+  &__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+
+    .mat-mdc-icon-button {
+      color: inherit;
+    }
+  }
+}
+
+.rp-main {
+  flex: 1 1 auto;
+  display: block;
+}
+
+.rp-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 20px 24px;
+  background: var(--mat-sys-surface-container);
+  color: var(--rp-muted-fg);
+  font-size: 14px;
+  border-top: 1px solid var(--rp-border);
+}
+
+@media (max-width: 480px) {
+  .rp-header {
+    padding: 0 16px;
+
+    &__title {
+      display: none;
+    }
+  }
+}

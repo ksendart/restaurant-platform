@@ -1,0 +1,24 @@
+<div class="rp-auth-layout">
+  <section class="rp-auth-layout__content">
+    <a
+      class="rp-auth-layout__brand"
+      routerLink="/menu"
+      aria-label="Restaurant Platform — home"
+    >
+      <mat-icon class="rp-auth-layout__logo" fontSet="material-symbols-outlined"
+        >dining</mat-icon
+      >
+      <span class="rp-auth-layout__title">Restaurant Platform</span>
+    </a>
+
+    <div class="rp-auth-layout__outlet">
+      <router-outlet />
+    </div>
+  </section>
+
+  <aside
+    class="rp-auth-layout__hero"
+    aria-hidden="true"
+    [style.backgroundImage]="'url(' + heroUrl() + ')'"
+  ></aside>
+</div>
