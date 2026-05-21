@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { DishDto } from '@restaurant/shared-types';
 import { Dish, DishDocument } from './dish.schema';
-import { DishDTO } from './dish.dto';
 
 @Injectable()
 export class MenuService {
@@ -10,12 +10,12 @@ export class MenuService {
     @InjectModel(Dish.name) private readonly dishModel: Model<Dish>
   ) {}
 
-  async findAll(): Promise<DishDTO[]> {
+  async findAll(): Promise<DishDto[]> {
     const docs = await this.dishModel.find({ isArchived: false }).lean().exec();
     return docs.map(toDto);
   }
 
-  async findById(id: string): Promise<DishDTO> {
+  async findById(id: string): Promise<DishDto> {
     const doc = await this.dishModel
       .findOne({ _id: id, isArchived: false })
       .lean()
@@ -38,7 +38,7 @@ type LeanDish = Pick<
   | 'isAvailable'
 >;
 
-function toDto(doc: LeanDish): DishDTO {
+function toDto(doc: LeanDish): DishDto {
   return {
     id: String(doc._id),
     name: doc.name,

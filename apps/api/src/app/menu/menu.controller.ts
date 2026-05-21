@@ -1,19 +1,19 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ParseObjectIdPipe } from '../common/parse-object-id.pipe';
 import { MenuService } from './menu.service';
-import { DishDTO } from './dish.dto';
+import { DishDto } from '@restaurant/shared-types';
 
 @Controller('menu')
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
   @Get()
-  findAll(): Promise<DishDTO[]> {
+  findAll(): Promise<DishDto[]> {
     return this.menuService.findAll();
   }
 
   @Get(':id')
-  findById(@Param('id', ParseObjectIdPipe) id: string): Promise<DishDTO> {
+  findById(@Param('id', ParseObjectIdPipe) id: string): Promise<DishDto> {
     return this.menuService.findById(id);
   }
 }

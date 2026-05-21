@@ -1,7 +1,8 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Dish, DishCategory } from './dish.schema';
+import { DishCategory } from '@restaurant/shared-types';
+import { Dish } from './dish.schema';
 
 type DishSeed = {
   name: string;

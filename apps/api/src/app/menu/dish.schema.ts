@@ -1,8 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-
-export const DISH_CATEGORIES = ['starter', 'main', 'dessert', 'drink'] as const;
-export type DishCategory = (typeof DISH_CATEGORIES)[number];
+import { DISH_CATEGORIES, DishCategory } from '@restaurant/shared-types';
 
 @Schema({ collection: 'dishes', timestamps: true })
 export class Dish {
