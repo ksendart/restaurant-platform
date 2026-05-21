@@ -90,6 +90,7 @@ export class CheckoutPage {
   protected readonly status = signal<CheckoutStatus>('idle');
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly countdown = signal(REDIRECT_AFTER_SUCCESS_SEC);
+  protected readonly placedOrderId = signal<string | null>(null);
 
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -139,9 +140,10 @@ export class CheckoutPage {
     this.placeOrder();
   }
 
-  protected goToMenuNow(): void {
+  protected goToOrderNow(): void {
+    const id = this.placedOrderId();
     this.stopCountdown();
-    void this.router.navigateByUrl('/menu');
+    void this.router.navigateByUrl(id ? `/account/orders/${id}` : '/menu');
   }
 
   private placeOrder(): void {
@@ -160,8 +162,9 @@ export class CheckoutPage {
     this.ordersApi
       .create({ items, contact, pickupSlot: pickup.slot })
       .subscribe({
-        next: () => {
+        next: (order) => {
           this.cartStore.clear();
+          this.placedOrderId.set(order.id);
           this.status.set('success');
           this.startCountdown();
         },
@@ -177,8 +180,9 @@ export class CheckoutPage {
     this.countdownTimer = setInterval(() => {
       const next = this.countdown() - 1;
       if (next <= 0) {
+        const id = this.placedOrderId();
         this.stopCountdown();
-        void this.router.navigateByUrl('/menu');
+        void this.router.navigateByUrl(id ? `/account/orders/${id}` : '/menu');
         return;
       }
       this.countdown.set(next);
