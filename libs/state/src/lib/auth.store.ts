@@ -32,24 +32,46 @@ import {
 } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 
-export type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'guest';
+export type AuthStatus =
+  | 'idle'
+  | 'loading'
+  | 'authenticated'
+  | 'guest'
+  | 'error';
 
 interface AuthState {
   user: AuthUser | null;
   accessToken: string | null;
   status: AuthStatus;
+  lastError: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
   accessToken: null,
   status: 'idle',
+  lastError: null,
 };
 
 const REFRESH_LEAD_MS = 60_000;
 
 interface JwtPayloadWithExp {
   exp?: number;
+}
+
+function extractAuthError(err: unknown, flow: 'login' | 'register'): string {
+  const status = (err as { status?: number })?.status;
+  if (status === 401 || (flow === 'login' && status === 400)) {
+    return 'Invalid email or password';
+  }
+  if (flow === 'register' && status === 409) {
+    return 'An account with this email already exists';
+  }
+  const body = (err as { error?: { message?: string | string[] } })?.error;
+  if (body?.message) {
+    return Array.isArray(body.message) ? body.message.join(', ') : body.message;
+  }
+  return 'Something went wrong. Please try again.';
 }
 
 function readExpiryMs(token: string): number | null {
@@ -79,6 +101,7 @@ export const AuthStore = signalStore(
         user: response.user,
         accessToken: response.accessToken,
         status: 'authenticated',
+        lastError: null,
       });
     }
 
@@ -87,6 +110,16 @@ export const AuthStore = signalStore(
         user: null,
         accessToken: null,
         status: 'guest',
+        lastError: null,
+      });
+    }
+
+    function applyAuthError(message: string): void {
+      patchState(store, {
+        user: null,
+        accessToken: null,
+        status: 'error',
+        lastError: message,
       });
     }
 
@@ -110,12 +143,12 @@ export const AuthStore = signalStore(
 
     const login = rxMethod<LoginRequest>(
       pipe(
-        tap(() => patchState(store, { status: 'loading' })),
+        tap(() => patchState(store, { status: 'loading', lastError: null })),
         switchMap((body) =>
           authApi.login(body).pipe(
             tap((response) => applySuccess(response)),
-            catchError(() => {
-              applyGuest();
+            catchError((err: unknown) => {
+              applyAuthError(extractAuthError(err, 'login'));
               return EMPTY;
             })
           )
@@ -125,12 +158,12 @@ export const AuthStore = signalStore(
 
     const register = rxMethod<RegisterRequest>(
       pipe(
-        tap(() => patchState(store, { status: 'loading' })),
+        tap(() => patchState(store, { status: 'loading', lastError: null })),
         switchMap((body) =>
           authApi.register(body).pipe(
             tap((response) => applySuccess(response)),
-            catchError(() => {
-              applyGuest();
+            catchError((err: unknown) => {
+              applyAuthError(extractAuthError(err, 'register'));
               return EMPTY;
             })
           )

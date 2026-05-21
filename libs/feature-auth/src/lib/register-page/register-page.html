@@ -9,6 +9,9 @@
     }
 
     <mat-card-content>
+      @if (status() === 'error' && lastError()) {
+      <p class="auth-error" role="alert">{{ lastError() }}</p>
+      }
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
         <mat-form-field appearance="outline">
           <mat-label>Email</mat-label>

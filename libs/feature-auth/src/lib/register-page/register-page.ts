@@ -65,6 +65,7 @@ export class RegisterPage {
   private readonly route = inject(ActivatedRoute);
 
   protected readonly status = this.authStore.status;
+  protected readonly lastError = this.authStore.lastError;
   protected readonly isLoading = computed(() => this.status() === 'loading');
   protected readonly submitted = signal(false);
   protected readonly confirmPasswordMatcher = new ConfirmPasswordErrorMatcher();
