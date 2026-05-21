@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@restaurant/data-access-menu": ["libs/data-access/menu/src/index.ts"],
       "@restaurant/shared-types": ["libs/shared-types/src/index.ts"],
       "@restaurant/state": ["libs/state/src/index.ts"],
       "@restaurant/state-features": ["libs/state-features/src/index.ts"]
