@@ -5,6 +5,7 @@ import { PingModule } from './ping/ping.module';
 import { MenuModule } from './menu/menu.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
     MenuModule,
     UsersModule,
     AuthModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}

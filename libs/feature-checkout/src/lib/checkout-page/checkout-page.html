@@ -1,78 +1,57 @@
 <section class="rp-checkout">
+  @if (status() !== 'success') {
   <header class="rp-checkout__header">
     <h1>Checkout</h1>
     <p class="rp-checkout__summary">
       Items: {{ cart.totalCount() }} · Total: {{ cart.totalPrice() }}
     </p>
   </header>
-
-  @if (cart.isEmpty()) {
-  <p class="rp-checkout__empty">Your cart is empty.</p>
-  <a
-    mat-stroked-button
-    color="primary"
-    routerLink="/menu"
-    class="rp-checkout__add-more"
-  >
-    <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
-    Browse menu
-  </a>
+  } @if (status() === 'submitting') {
+  <div class="rp-checkout__pending">
+    <p>Sending your order to the kitchen…</p>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+  } @else if (status() === 'success') {
+  <div class="rp-checkout__success">
+    <mat-icon
+      class="rp-checkout__success-icon"
+      fontSet="material-symbols-outlined"
+      >check_circle</mat-icon
+    >
+    <h2>Thanks for your order!</h2>
+    <p>We've sent it to the kitchen.</p>
+    <p class="rp-checkout__countdown">
+      Redirecting to the menu in {{ countdown() }} seconds
+    </p>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="goToMenuNow()"
+    >
+      Go to menu now
+    </button>
+  </div>
+  } @else if (status() === 'error') {
+  <ng-container
+    *ngTemplateOutlet="itemsBlock; context: { showAddMore: false }"
+  ></ng-container>
+  <div class="rp-checkout__error">
+    <mat-icon
+      class="rp-checkout__error-icon"
+      fontSet="material-symbols-outlined"
+      >error</mat-icon
+    >
+    <h2>We couldn't place your order</h2>
+    <p>{{ errorMessage() }}</p>
+    <button mat-flat-button color="primary" type="button" (click)="retry()">
+      Try again
+    </button>
+  </div>
   } @else {
-  <ul class="rp-checkout__items">
-    @for (item of cart.items(); track item.dishId) {
-    <li class="rp-checkout__item">
-      <img
-        class="rp-checkout__item-image"
-        [src]="item.imageUrl"
-        [alt]="item.name"
-        loading="lazy"
-        width="64"
-        height="64"
-      />
-      <div class="rp-checkout__item-info">
-        <span class="rp-checkout__item-name">{{ item.name }}</span>
-        <span class="rp-checkout__item-price">{{ item.price }}</span>
-      </div>
-      <div class="rp-checkout__item-qty">
-        <button
-          mat-icon-button
-          type="button"
-          aria-label="Decrease quantity"
-          (click)="cart.decrement(item.dishId)"
-        >
-          <mat-icon fontSet="material-symbols-outlined">remove</mat-icon>
-        </button>
-        <span class="rp-checkout__item-count">{{ item.count }}</span>
-        <button
-          mat-icon-button
-          type="button"
-          aria-label="Increase quantity"
-          (click)="cart.increment(item.dishId)"
-        >
-          <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
-        </button>
-      </div>
-      <button
-        mat-icon-button
-        type="button"
-        aria-label="Remove item"
-        (click)="cart.remove(item.dishId)"
-      >
-        <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
-      </button>
-    </li>
-    }
-  </ul>
-  <a
-    mat-stroked-button
-    color="primary"
-    routerLink="/menu"
-    class="rp-checkout__add-more"
-  >
-    <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
-    Add more dishes
-  </a>
-  }
+  <ng-container
+    *ngTemplateOutlet="itemsBlock; context: { showAddMore: true }"
+  ></ng-container>
 
   <mat-stepper linear>
     <mat-step [stepControl]="contactsForm" label="Contacts">
@@ -178,4 +157,77 @@
       </div>
     </mat-step>
   </mat-stepper>
+  }
+
+  <ng-template #itemsBlock let-showAddMore="showAddMore">
+    @if (cart.isEmpty()) {
+    <p class="rp-checkout__empty">Your cart is empty.</p>
+    @if (showAddMore) {
+    <a
+      mat-stroked-button
+      color="primary"
+      routerLink="/menu"
+      class="rp-checkout__add-more"
+    >
+      <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+      Browse menu
+    </a>
+    } } @else {
+    <ul class="rp-checkout__items">
+      @for (item of cart.items(); track item.dishId) {
+      <li class="rp-checkout__item">
+        <img
+          class="rp-checkout__item-image"
+          [src]="item.imageUrl"
+          [alt]="item.name"
+          loading="lazy"
+          width="64"
+          height="64"
+        />
+        <div class="rp-checkout__item-info">
+          <span class="rp-checkout__item-name">{{ item.name }}</span>
+          <span class="rp-checkout__item-price">{{ item.price }}</span>
+        </div>
+        <div class="rp-checkout__item-qty">
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Decrease quantity"
+            (click)="cart.decrement(item.dishId)"
+          >
+            <mat-icon fontSet="material-symbols-outlined">remove</mat-icon>
+          </button>
+          <span class="rp-checkout__item-count">{{ item.count }}</span>
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Increase quantity"
+            (click)="cart.increment(item.dishId)"
+          >
+            <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+          </button>
+        </div>
+        <button
+          mat-icon-button
+          type="button"
+          aria-label="Remove item"
+          (click)="cart.remove(item.dishId)"
+        >
+          <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+        </button>
+      </li>
+      }
+    </ul>
+    @if (showAddMore) {
+    <a
+      mat-stroked-button
+      color="primary"
+      routerLink="/menu"
+      class="rp-checkout__add-more"
+    >
+      <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+      Add more dishes
+    </a>
+    } }
+  </ng-template>
 </section>

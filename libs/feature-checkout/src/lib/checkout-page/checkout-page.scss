@@ -105,4 +105,38 @@
     gap: 4px;
     margin-bottom: 24px;
   }
+
+  &__pending,
+  &__success,
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding: 48px 16px;
+  }
+
+  &__pending mat-progress-bar {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  &__success-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    color: var(--mat-sys-tertiary);
+  }
+
+  &__error-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    color: var(--mat-sys-error);
+  }
+
+  &__countdown {
+    color: var(--rp-muted-fg);
+  }
 }
