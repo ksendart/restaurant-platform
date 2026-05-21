@@ -6,13 +6,15 @@ import { Ping } from './ping.schema';
 
 @Injectable()
 export class PingService {
-  constructor(@InjectModel(Ping.name) private readonly model: Model<Ping>) {}
+  constructor(
+    @InjectModel(Ping.name) private readonly pingModel: Model<Ping>
+  ) {}
 
   async tick(): Promise<PingResponse> {
-    const doc = await this.model.findOneAndUpdate(
+    const doc = await this.pingModel.findOneAndUpdate(
       {},
       { $inc: { count: 1 } },
-      { new: true, upsert: true },
+      { new: true, upsert: true }
     );
     return { pong: true, count: doc.count, time: Date.now() };
   }

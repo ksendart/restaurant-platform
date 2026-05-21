@@ -109,10 +109,12 @@ const SEED_DISHES: DishSeed[] = [
 export class DishSeeder implements OnApplicationBootstrap {
   private readonly logger = new Logger(DishSeeder.name);
 
-  constructor(@InjectModel(Dish.name) private readonly model: Model<Dish>) {}
+  constructor(
+    @InjectModel(Dish.name) private readonly dishModel: Model<Dish>
+  ) {}
 
   async onApplicationBootstrap(): Promise<void> {
-    const existing = await this.model.estimatedDocumentCount();
+    const existing = await this.dishModel.estimatedDocumentCount();
     if (existing > 0) {
       this.logger.log(
         `Dishes collection already has ${existing} docs, skipping seed.`
@@ -125,7 +127,7 @@ export class DishSeeder implements OnApplicationBootstrap {
       imageUrl: `https://picsum.photos/seed/dish-${index + 1}/640/480`,
     }));
 
-    await this.model.insertMany(docs);
+    await this.dishModel.insertMany(docs);
     this.logger.log(`Seeded ${docs.length} dishes.`);
   }
 }
