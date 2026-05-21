@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.auth-shell {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+
+  ::ng-deep .mat-mdc-card-content {
+    padding: 16px;
+  }
+
+  ::ng-deep .mat-mdc-card-actions {
+    padding: 0 16px 16px;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+}
