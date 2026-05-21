@@ -1,3 +1,15 @@
 import { Route } from '@angular/router';
 
-export const appRoutes: Route[] = [];
+export const appRoutes: Route[] = [
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'menu',
+  },
+  {
+    path: 'menu',
+    loadComponent: () =>
+      import('@restaurant-platform/feature-menu').then((m) => m.MenuPage),
+    title: 'Menu',
+  },
+];

@@ -1,0 +1,36 @@
+<rp-card>
+  <div class="media">
+    @if (!imageFailed()) {
+    <img
+      [src]="dish().imageUrl"
+      [alt]="dish().name"
+      loading="lazy"
+      (error)="onImageError()"
+    />
+    } @else {
+    <div class="media-fallback" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        width="40"
+        height="40"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <path d="m21 15-5-5L5 21" />
+        <line x1="3" y1="21" x2="21" y2="3" />
+      </svg>
+    </div>
+    } @if (!dish().isAvailable) {
+    <span class="sold-out-badge">Sold out</span>
+    }
+  </div>
+
+  <div class="body">
+    <h3 class="name">{{ dish().name }}</h3>
+    <p class="description">{{ dish().description }}</p>
+    <rp-price class="price" [value]="dish().price" />
+  </div>
+</rp-card>

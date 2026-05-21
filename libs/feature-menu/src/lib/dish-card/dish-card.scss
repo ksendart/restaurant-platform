@@ -1,0 +1,76 @@
+:host {
+  display: block;
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--rp-skeleton-bg, #e5e7eb);
+  overflow: hidden;
+}
+
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.media-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rp-muted-fg, #9ca3af);
+}
+
+.sold-out-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--rp-danger-bg, rgba(0, 0, 0, 0.7));
+  border-radius: 999px;
+}
+
+.body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.description {
+  margin: 0;
+  font-size: 14px;
+  color: var(--rp-muted-fg, #6b7280);
+  line-height: 1.4;
+}
+
+.price {
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--rp-accent-fg, #111);
+}
+
+:host(.is-sold-out) {
+  .media img,
+  .name,
+  .description,
+  .price {
+    opacity: 0.5;
+  }
+}

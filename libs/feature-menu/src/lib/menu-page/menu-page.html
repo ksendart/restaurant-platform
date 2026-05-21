@@ -1,0 +1,50 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Menu</h1>
+
+    <nav class="filters" aria-label="Category filters">
+      @for (f of filters; track f) {
+      <button
+        type="button"
+        class="filter-btn"
+        [class.is-active]="filter() === f"
+        [attr.aria-pressed]="filter() === f"
+        (click)="setFilter(f)"
+      >
+        {{ labelFor(f) }}
+      </button>
+      }
+    </nav>
+
+    @switch (filter()) { @case ('all') {
+    <p class="subtitle">Browse all dishes by category.</p>
+    } @default {
+    <p class="subtitle">Showing only {{ labelFor(filter()) }}.</p>
+    } }
+  </header>
+
+  @if (error()) {
+  <p class="error" role="alert">
+    Could not load the menu. Please try again later.
+  </p>
+  } @else if (isLoading() && dishes().length === 0) {
+  <div class="grid">
+    @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+    <rp-skeleton
+      style="--rp-skeleton-h: 280px; --rp-skeleton-radius: 12px"
+    ></rp-skeleton>
+    }
+  </div>
+  } @else { @for (section of sections(); track section.category) {
+  <section class="category-section">
+    <h2 class="category-title">{{ labelFor(section.category) }}</h2>
+    <div class="grid">
+      @for (dish of section.dishes; track dish.id) {
+      <rp-dish-card [dish]="dish" />
+      }
+    </div>
+  </section>
+  } @empty {
+  <p class="empty">No dishes match the selected filter.</p>
+  } }
+</section>

@@ -1,13 +1,1 @@
-<main class="ping">
-  <h1>Restaurant Platform — Iteration 0</h1>
-
-  @if (ping.isLoading()) {
-    <p>Loading…</p>
-  } @else if (ping.error()) {
-    <p class="error">API unreachable</p>
-  } @else if (ping.value(); as data) {
-    <p>Pong: <strong>{{ data.pong }}</strong></p>
-    <p>Mongo counter: <strong>{{ data.count }}</strong></p>
-    <p>Server time: <strong>{{ data.time }}</strong></p>
-  }
-</main>
+<router-outlet />

@@ -18,6 +18,7 @@
       "@restaurant-platform/data-access-menu": [
         "libs/data-access/menu/src/index.ts"
       ],
+      "@restaurant-platform/feature-menu": ["libs/feature-menu/src/index.ts"],
       "@restaurant-platform/shared-types": ["libs/shared-types/src/index.ts"],
       "@restaurant-platform/state": ["libs/state/src/index.ts"],
       "@restaurant-platform/state-features": [
