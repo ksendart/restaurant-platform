@@ -13,4 +13,12 @@ export class OrdersApi {
   create(body: CreateOrderRequest): Observable<OrderDto> {
     return this.http.post<OrderDto>('/api/orders', body);
   }
+
+  list(): Observable<OrderDto[]> {
+    return this.http.get<OrderDto[]>('/api/orders');
+  }
+
+  getById(id: string): Observable<OrderDto> {
+    return this.http.get<OrderDto>(`/api/orders/${id}`);
+  }
 }

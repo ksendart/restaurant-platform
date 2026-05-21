@@ -29,6 +29,24 @@ export const appRoutes: Route[] = [
           ),
         title: 'Checkout',
       },
+      {
+        path: 'account/orders',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('@restaurant-platform/feature-account').then(
+            (m) => m.AccountOrdersPage
+          ),
+        title: 'My orders',
+      },
+      {
+        path: 'account/orders/:id',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('@restaurant-platform/feature-account').then(
+            (m) => m.OrderDetailPage
+          ),
+        title: 'Order',
+      },
     ],
   },
   {

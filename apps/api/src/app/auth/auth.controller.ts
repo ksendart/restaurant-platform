@@ -13,13 +13,17 @@ import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
 import { AuthUser } from '@restaurant-platform/shared-types';
 import { AuthService, AuthTokens } from './auth.service';
+import {
+  ACCESS_COOKIE,
+  ACCESS_COOKIE_PATH,
+  REFRESH_COOKIE,
+  REFRESH_COOKIE_PATH,
+} from './auth.cookies';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CurrentUser } from './current-user.decorator';
 import { AuthenticatedUser } from './jwt.strategy';
-
-const REFRESH_COOKIE = 'rp_refresh';
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +38,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<{ user: AuthUser; accessToken: string }> {
     const { user, tokens } = await this.authService.register(dto);
-    this.setRefreshCookie(res, tokens);
+    this.setAuthCookies(res, tokens);
     return { user, accessToken: tokens.accessToken };
   }
 
@@ -45,7 +49,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<{ user: AuthUser; accessToken: string }> {
     const { user, tokens } = await this.authService.login(dto);
-    this.setRefreshCookie(res, tokens);
+    this.setAuthCookies(res, tokens);
     return { user, accessToken: tokens.accessToken };
   }
 
@@ -61,7 +65,7 @@ export class AuthController {
     }
 
     const { user, tokens } = await this.authService.refresh(refreshToken);
-    this.setRefreshCookie(res, tokens);
+    this.setAuthCookies(res, tokens);
     return { user, accessToken: tokens.accessToken };
   }
 
@@ -73,21 +77,46 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<void> {
     await this.authService.logout(user.id);
-    this.clearRefreshCookie(res);
+    this.clearAuthCookies(res);
   }
 
-  private setRefreshCookie(res: Response, tokens: AuthTokens): void {
+  private setAuthCookies(res: Response, tokens: AuthTokens): void {
     const isProd = this.configService.get<string>('NODE_ENV') === 'production';
     res.cookie(REFRESH_COOKIE, tokens.refreshToken, {
       httpOnly: true,
       secure: isProd,
       sameSite: 'strict',
-      path: '/api/auth',
+      path: REFRESH_COOKIE_PATH,
       maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.cookie(ACCESS_COOKIE, tokens.accessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'strict',
+      path: ACCESS_COOKIE_PATH,
+      maxAge: this.accessTtlMs(),
     });
   }
 
-  private clearRefreshCookie(res: Response): void {
-    res.clearCookie(REFRESH_COOKIE, { path: '/api/auth' });
+  private clearAuthCookies(res: Response): void {
+    res.clearCookie(REFRESH_COOKIE, { path: REFRESH_COOKIE_PATH });
+    res.clearCookie(ACCESS_COOKIE, { path: ACCESS_COOKIE_PATH });
+  }
+
+  private accessTtlMs(): number {
+    const raw = this.configService.getOrThrow<string>('JWT_ACCESS_TTL');
+    const match = /^(\d+)([smhd])$/.exec(raw.trim());
+    if (!match) {
+      throw new Error(`Invalid JWT_ACCESS_TTL: ${raw}`);
+    }
+    const value = Number(match[1]);
+    const unit = match[2];
+    const multipliers: Record<string, number> = {
+      s: 1000,
+      m: 60 * 1000,
+      h: 60 * 60 * 1000,
+      d: 24 * 60 * 60 * 1000,
+    };
+    return value * multipliers[unit];
   }
 }

@@ -21,15 +21,15 @@
     <h2>Thanks for your order!</h2>
     <p>We've sent it to the kitchen.</p>
     <p class="rp-checkout__countdown">
-      Redirecting to the menu in {{ countdown() }} seconds
+      Opening your order in {{ countdown() }} seconds
     </p>
     <button
       mat-flat-button
       color="primary"
       type="button"
-      (click)="goToMenuNow()"
+      (click)="goToOrderNow()"
     >
-      Go to menu now
+      Open my order now
     </button>
   </div>
   } @else if (status() === 'error') {

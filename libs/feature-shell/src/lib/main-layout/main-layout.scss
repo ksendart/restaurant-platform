@@ -113,6 +113,116 @@
   color: var(--mat-sys-on-surface);
 }
 
+::ng-deep .rp-cart-menu {
+  .mat-mdc-menu-content {
+    min-width: 260px;
+    padding: 0;
+  }
+}
+
+::ng-deep .rp-cart-menu__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+
+  > a[mat-flat-button],
+  > a[mat-stroked-button] {
+    align-self: stretch;
+  }
+}
+
+::ng-deep .rp-cart-menu__title {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+::ng-deep .rp-cart-menu__empty {
+  font-size: 14px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+::ng-deep .rp-cart-menu__items,
+::ng-deep .rp-cart-menu__orders {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+::ng-deep .rp-cart-menu__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+::ng-deep .rp-cart-menu__item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+::ng-deep .rp-cart-menu__item-count {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+::ng-deep .rp-cart-menu__more {
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
+
+::ng-deep .rp-cart-menu__subtotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  padding-top: 4px;
+  border-top: 1px solid var(--rp-border);
+}
+
+::ng-deep .rp-cart-menu__order {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+::ng-deep .rp-cart-menu__order-id {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+::ng-deep .rp-cart-menu__order-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: capitalize;
+  background: rgba(0, 0, 0, 0.08);
+
+  &[data-status='pending'] {
+    background: rgba(255, 165, 0, 0.18);
+    color: rgb(150, 80, 0);
+  }
+  &[data-status='preparing'] {
+    background: rgba(0, 120, 200, 0.18);
+    color: rgb(0, 80, 140);
+  }
+  &[data-status='ready'] {
+    background: rgba(0, 150, 60, 0.2);
+    color: rgb(0, 100, 40);
+  }
+}
+
 @media (max-width: 480px) {
   .rp-header {
     padding: 0 16px;

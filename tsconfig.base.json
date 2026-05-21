@@ -24,6 +24,12 @@
       "@restaurant-platform/data-access-orders": [
         "libs/data-access/orders/src/index.ts"
       ],
+      "@restaurant-platform/data-access-sse": [
+        "libs/data-access/sse/src/index.ts"
+      ],
+      "@restaurant-platform/feature-account": [
+        "libs/feature-account/src/index.ts"
+      ],
       "@restaurant-platform/feature-auth": ["libs/feature-auth/src/index.ts"],
       "@restaurant-platform/feature-checkout": [
         "libs/feature-checkout/src/index.ts"
