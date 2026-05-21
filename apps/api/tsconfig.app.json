@@ -6,6 +6,7 @@
     "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "target": "es2021",
     "strictNullChecks": true,
     "noImplicitAny": true,

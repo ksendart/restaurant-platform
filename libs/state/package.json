@@ -6,6 +6,12 @@
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
   "dependencies": {
+    "@angular-architects/ngrx-toolkit": "^20.7.0",
+    "@angular/core": "~20.3.0",
+    "@ngrx/signals": "^20.1.0",
+    "@restaurant-platform/data-access-auth": "*",
+    "@restaurant-platform/shared-types": "*",
+    "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   }
 }

@@ -35,6 +35,38 @@
   <div class="body">
     <h3 class="name">{{ dish().name }}</h3>
     <p class="description">{{ dish().description }}</p>
-    <rp-price class="price" [value]="dish().price" />
+    <div class="footer">
+      <rp-price class="price" [value]="dish().price" />
+      @if (dish().isAvailable) { @if (cartCount() === 0) {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="cart.add(dish())"
+      >
+        Add to cart
+      </button>
+      } @else {
+      <div class="qty">
+        <button
+          mat-icon-button
+          type="button"
+          aria-label="Decrease quantity"
+          (click)="cart.decrement(dish().id)"
+        >
+          <mat-icon fontSet="material-symbols-outlined">remove</mat-icon>
+        </button>
+        <span class="qty-count">{{ cartCount() }}</span>
+        <button
+          mat-icon-button
+          type="button"
+          aria-label="Increase quantity"
+          (click)="cart.increment(dish().id)"
+        >
+          <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+        </button>
+      </div>
+      } }
+    </div>
   </div>
 </rp-card>

@@ -1,0 +1,72 @@
+<div class="rp-main-layout">
+  <header class="rp-header">
+    <a
+      class="rp-header__brand"
+      routerLink="/menu"
+      aria-label="Restaurant Platform — home"
+    >
+      <mat-icon class="rp-header__logo" fontSet="material-symbols-outlined"
+        >dining</mat-icon
+      >
+      <span class="rp-header__title">Restaurant Platform</span>
+    </a>
+
+    <nav class="rp-header__actions" aria-label="User navigation">
+      <button
+        mat-icon-button
+        type="button"
+        [matMenuTriggerFor]="userMenu"
+        [attr.aria-label]="auth.isAuthorized() ? 'User menu' : 'Sign in menu'"
+      >
+        <mat-icon fontSet="material-symbols-outlined">
+          {{ auth.isAuthorized() ? 'account_circle' : 'person' }}
+        </mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu">
+        @if (auth.isAuthorized()) {
+        <div class="rp-user-menu__info">
+          <span class="rp-user-menu__label">Signed in as</span>
+          <span class="rp-user-menu__email">{{ auth.user()?.email }}</span>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item type="button" (click)="signOut()">
+          <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
+          <span>Sign out</span>
+        </button>
+        } @else {
+        <a mat-menu-item routerLink="/auth/login">
+          <mat-icon fontSet="material-symbols-outlined">login</mat-icon>
+          <span>Sign in</span>
+        </a>
+        <a mat-menu-item routerLink="/auth/register">
+          <mat-icon fontSet="material-symbols-outlined">person_add</mat-icon>
+          <span>Create account</span>
+        </a>
+        }
+      </mat-menu>
+
+      <a
+        mat-icon-button
+        routerLink="/checkout"
+        aria-label="Cart"
+        class="rp-header__cart"
+      >
+        <mat-icon fontSet="material-symbols-outlined">shopping_cart</mat-icon>
+        @if (!cart.isEmpty()) {
+        <span class="rp-header__cart-badge">{{ cart.totalCount() }}</span>
+        }
+      </a>
+    </nav>
+  </header>
+
+  <main class="rp-main">
+    <router-outlet />
+  </main>
+
+  <footer class="rp-footer">
+    <span>Restaurant Platform</span>
+    <span>Ksenya Arysheva</span>
+    <span>{{ currentYear }}</span>
+  </footer>
+</div>

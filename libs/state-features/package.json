@@ -6,6 +6,9 @@
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
   "dependencies": {
+    "@angular/common": "~20.3.0",
+    "@angular/core": "~20.3.0",
+    "@ngrx/signals": "^20.1.0",
     "tslib": "^2.3.0"
   }
 }

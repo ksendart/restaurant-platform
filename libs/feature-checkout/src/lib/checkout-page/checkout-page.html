@@ -1,0 +1,233 @@
+<section class="rp-checkout">
+  @if (status() !== 'success') {
+  <header class="rp-checkout__header">
+    <h1>Checkout</h1>
+    <p class="rp-checkout__summary">
+      Items: {{ cart.totalCount() }} · Total: {{ cart.totalPrice() }}
+    </p>
+  </header>
+  } @if (status() === 'submitting') {
+  <div class="rp-checkout__pending">
+    <p>Sending your order to the kitchen…</p>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+  } @else if (status() === 'success') {
+  <div class="rp-checkout__success">
+    <mat-icon
+      class="rp-checkout__success-icon"
+      fontSet="material-symbols-outlined"
+      >check_circle</mat-icon
+    >
+    <h2>Thanks for your order!</h2>
+    <p>We've sent it to the kitchen.</p>
+    <p class="rp-checkout__countdown">
+      Redirecting to the menu in {{ countdown() }} seconds
+    </p>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="goToMenuNow()"
+    >
+      Go to menu now
+    </button>
+  </div>
+  } @else if (status() === 'error') {
+  <ng-container
+    *ngTemplateOutlet="itemsBlock; context: { showAddMore: false }"
+  ></ng-container>
+  <div class="rp-checkout__error">
+    <mat-icon
+      class="rp-checkout__error-icon"
+      fontSet="material-symbols-outlined"
+      >error</mat-icon
+    >
+    <h2>We couldn't place your order</h2>
+    <p>{{ errorMessage() }}</p>
+    <button mat-flat-button color="primary" type="button" (click)="retry()">
+      Try again
+    </button>
+  </div>
+  } @else {
+  <ng-container
+    *ngTemplateOutlet="itemsBlock; context: { showAddMore: true }"
+  ></ng-container>
+
+  <mat-stepper linear>
+    <mat-step [stepControl]="contactsForm" label="Contacts">
+      <form [formGroup]="contactsForm" class="rp-checkout__form">
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" autocomplete="name" />
+          @if (contactsForm.controls.name.touched &&
+          contactsForm.controls.name.errors?.['required']) {
+          <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Phone</mat-label>
+          <input
+            matInput
+            formControlName="phone"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="+49 170 1234567"
+          />
+          <mat-hint
+            >We'll use this number to contact you about the order</mat-hint
+          >
+          @if (contactsForm.controls.phone.touched &&
+          contactsForm.controls.phone.errors?.['required']) {
+          <mat-error>Phone is required</mat-error>
+          } @else if (contactsForm.controls.phone.touched &&
+          contactsForm.controls.phone.errors?.['pattern']) {
+          <mat-error>Enter a valid phone number</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+          />
+          <mat-hint>We'll send order updates here</mat-hint>
+          @if (contactsForm.controls.email.touched &&
+          contactsForm.controls.email.errors?.['required']) {
+          <mat-error>Email is required</mat-error>
+          } @else if (contactsForm.controls.email.touched &&
+          contactsForm.controls.email.errors?.['email']) {
+          <mat-error>Enter a valid email</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="rp-checkout__actions">
+          <button mat-flat-button color="primary" matStepperNext type="button">
+            Next
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="pickupForm" label="Pickup time">
+      <form [formGroup]="pickupForm" class="rp-checkout__form">
+        <mat-form-field appearance="outline">
+          <mat-label>Pickup slot</mat-label>
+          <mat-select formControlName="slot">
+            @for (slot of pickupSlots; track slot) {
+            <mat-option [value]="slot">{{ slot }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint
+            >The restaurant accepts orders between 10:00 and 22:00</mat-hint
+          >
+          @if (pickupForm.controls.slot.touched &&
+          pickupForm.controls.slot.errors?.['required']) {
+          <mat-error>Pick a time</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="rp-checkout__actions">
+          <button mat-button matStepperPrevious type="button">Back</button>
+          <button mat-flat-button color="primary" matStepperNext type="button">
+            Next
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="paymentForm" label="Payment">
+      <p class="rp-checkout__payment-note">
+        Payment will be processed at pickup.
+      </p>
+      <div class="rp-checkout__actions">
+        <button mat-button matStepperPrevious type="button">Back</button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          [disabled]="cart.isEmpty()"
+          (click)="onSubmit()"
+        >
+          Place order
+        </button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+  }
+
+  <ng-template #itemsBlock let-showAddMore="showAddMore">
+    @if (cart.isEmpty()) {
+    <p class="rp-checkout__empty">Your cart is empty.</p>
+    @if (showAddMore) {
+    <a
+      mat-stroked-button
+      color="primary"
+      routerLink="/menu"
+      class="rp-checkout__add-more"
+    >
+      <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+      Browse menu
+    </a>
+    } } @else {
+    <ul class="rp-checkout__items">
+      @for (item of cart.items(); track item.dishId) {
+      <li class="rp-checkout__item">
+        <img
+          class="rp-checkout__item-image"
+          [src]="item.imageUrl"
+          [alt]="item.name"
+          loading="lazy"
+          width="64"
+          height="64"
+        />
+        <div class="rp-checkout__item-info">
+          <span class="rp-checkout__item-name">{{ item.name }}</span>
+          <span class="rp-checkout__item-price">{{ item.price }}</span>
+        </div>
+        <div class="rp-checkout__item-qty">
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Decrease quantity"
+            (click)="cart.decrement(item.dishId)"
+          >
+            <mat-icon fontSet="material-symbols-outlined">remove</mat-icon>
+          </button>
+          <span class="rp-checkout__item-count">{{ item.count }}</span>
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Increase quantity"
+            (click)="cart.increment(item.dishId)"
+          >
+            <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+          </button>
+        </div>
+        <button
+          mat-icon-button
+          type="button"
+          aria-label="Remove item"
+          (click)="cart.remove(item.dishId)"
+        >
+          <mat-icon fontSet="material-symbols-outlined">close</mat-icon>
+        </button>
+      </li>
+      }
+    </ul>
+    @if (showAddMore) {
+    <a
+      mat-stroked-button
+      color="primary"
+      routerLink="/menu"
+      class="rp-checkout__add-more"
+    >
+      <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+      Add more dishes
+    </a>
+    } }
+  </ng-template>
+</section>
