@@ -21,6 +21,7 @@
 **Цель:** монорепо с пустыми app и сквозным «hello world» от Mongo до фронта.
 
 ### Шаги
+
 1. `npx create-nx-workspace restaurant-platform --preset=ts` → выбрать пустой preset.
 2. `nx g @nx/angular:app web --ssr --standalone --routing --style=scss`.
 3. `nx g @nx/nest:app api`.
@@ -37,10 +38,12 @@
 14. Husky + lint-staged (опционально, но дешёво).
 
 ### Demo
+
 - `nx serve web` + `nx serve api` локально.
 - Открыть `http://localhost:4200` → видна цифра, обновляется при перезагрузке.
 
 ### Acceptance
+
 - [ ] `nx affected -t lint test build` проходит локально.
 - [ ] SSR работает: `curl http://localhost:4200` отдаёт HTML с актуальной цифрой.
 - [ ] Mongo поднимается через `docker-compose up`.
@@ -52,6 +55,7 @@
 **Цель:** Гость может зайти на `/menu` и увидеть меню, отрендеренное на сервере. Покрывает G-1, G-2.
 
 ### Шаги
+
 1. Установить **Husky** + **lint-staged**: pre-commit hook прогоняет `lint` и `prettier --write` на staged-файлах. Цель — больше никаких рукопашных `nx lint` перед коммитом, и никаких форматных артефактов в истории.
 2. Mongoose схема `Dish` + сидер с 10-15 тестовыми блюдами.
 3. Nest endpoints: `GET /api/menu` (все блюда, group by category), `GET /api/menu/:id`.
@@ -67,9 +71,11 @@
 13. Lighthouse: добиться SEO ≥ 95, Performance ≥ 85 на `/menu`.
 
 ### Demo
+
 - `/menu` рендерится на сервере, фильтр по категориям работает, скелетоны при загрузке, ниже первого экрана — defer-блоки.
 
 ### Acceptance
+
 - [ ] Disabled JS → меню всё ещё видно (SSR).
 - [ ] Network throttling Slow 3G → skeleton-карточки появляются до контента.
 - [ ] Lighthouse Performance ≥ 85.
@@ -84,6 +90,7 @@
 **State management в этой итерации:** появляются первые глобальные stores — пишем их сразу через `@ngrx/signals` `signalStore`. Это «point of entry» в Signal Store для всего проекта.
 
 ### Шаги
+
 1. Mongoose схема `User` (email, passwordHash, role, refreshTokenHash).
 2. Nest `AuthModule`: register / login / refresh / logout, JWT access (15 мин) + refresh (7 дней) в httpOnly cookie.
 3. `RolesGuard`, `JwtAuthGuard` в Nest.
@@ -102,10 +109,12 @@
 16. После заказа: `CartStore.clear()`, редирект на `/account/orders/:id`.
 
 ### Demo
+
 - Регистрация → корзина → заказ → попадание в БД.
 - В Redux DevTools видна история состояний обоих stores с time-travel.
 
 ### Acceptance
+
 - [ ] Refresh-token rotation работает (видно в DevTools cookies).
 - [ ] `canDeactivate` спрашивает подтверждение при попытке уйти.
 - [ ] Корзина переживает перезагрузку страницы (через `withStorage`).
@@ -121,6 +130,7 @@
 **State management:** заводим первый «фичевой» Signal Store с `withEntities` для коллекций заказов и `rxMethod` для SSE-подписки.
 
 ### Шаги
+
 1. В Nest: `EventEmitter2`, событие `order.status.changed`.
 2. `OrdersService` эмитит событие при каждом изменении статуса.
 3. `@Sse('/api/orders/:id/stream')` endpoint фильтрует по `orderId`.
@@ -133,10 +143,12 @@
 10. Индикатор «соединение восстановлено» при reconnect SSE — отдельный `signal` в `UserOrdersStore` (`sseConnected`).
 
 ### Demo
+
 - Открыть заказ в одной вкладке, в другой через `curl` поменять статус → видно мгновенно.
 - В Redux DevTools видно `updateEntity` действие при каждом SSE-событии.
 
 ### Acceptance
+
 - [ ] При обрыве сети `EventSource` сам переподключается, на UI — индикатор.
 - [ ] Отписка при уничтожении компонента — `rxMethod` сам убирает подписку при destroy инжектора.
 - [ ] `UserOrdersStore` использует `withEntities` (видно в DevTools нормализованную структуру).
@@ -150,6 +162,7 @@
 **State management:** заводим **`AdminOrdersStore`** — самый «фичеёмкий» store в проекте, демонстрирует все возможности Signal Store: `withEntities` для коллекции, `rxMethod` для SSE broadcast, optimistic-update с откатом, `withComputed` для деривированных счётчиков.
 
 ### Шаги
+
 1. Создать seed-админа в Nest startup-скрипте.
 2. Lazy-route `/admin` с `canMatch(adminGuard)` — chunk не попадает в guest-bundle.
 3. Admin layout: sidebar (desktop) / bottom-sheet (mobile).
@@ -167,10 +180,12 @@
 10. Счётчик новых заказов в badge на иконке навигации — из `pendingCount()` computed.
 
 ### Demo
+
 - Открыть админку в одной вкладке, гостевую корзину в другой → оформить заказ → админ видит мгновенно.
 - В Redux DevTools при изменении статуса видны два события: optimistic-update и потом server-confirmation; при искусственной ошибке — откат.
 
 ### Acceptance
+
 - [ ] Guest получает 403 на `/admin` (canMatch блокирует).
 - [ ] Admin chunk не попадает в bundle для guest (проверяется через `nx build web --stats-json` + analyzer).
 - [ ] Optimistic-update откатывается при искусственной 500-ошибке от Nest.
@@ -183,6 +198,7 @@
 **Цель:** Админ редактирует меню. Покрывает A-4.
 
 ### Шаги
+
 1. `AdminMenuComponent`: таблица блюд с фильтрами/сортировкой.
 2. `AdminDishEditComponent` lazy-route с `resolve` для загрузки блюда до показа.
 3. Reactive Form: основные поля + кастомный CVA `<r-side-dish-picker>`.
@@ -193,9 +209,11 @@
 8. Архивирование вместо удаления (`isArchived: true`).
 
 ### Demo
+
 - Админ создаёт новое блюдо → переключается в гостевую вкладку → перезагружает `/menu` → видит блюдо.
 
 ### Acceptance
+
 - [ ] CVA-контрол валидируется как родная form-control.
 - [ ] При попытке уйти с dirty-формой — подтверждение.
 
@@ -206,6 +224,7 @@
 **Цель:** Админ видит график выручки и топ блюд. Покрывает A-5.
 
 ### Шаги
+
 1. Mongo aggregation pipelines: выручка по дням, топ блюд.
 2. Endpoint `GET /api/admin/analytics/revenue?days=7|30`.
 3. Endpoint `GET /api/admin/analytics/top-dishes`.
@@ -215,9 +234,11 @@
 7. Date-range picker (Material).
 
 ### Demo
+
 - Дашборд с двумя графиками + 3 KPI-карточками.
 
 ### Acceptance
+
 - [ ] Графики не попадают в initial admin chunk (видно в bundle analyzer).
 - [ ] При смене date-range — `httpResource` авто-перезапрашивает.
 
@@ -228,6 +249,7 @@
 **Цель:** Дотягиваем до «production-ready» состояния.
 
 ### Шаги
+
 1. C-4 «Повторить заказ».
 2. C-5 Бронирование столика (`BookingsModule` в Nest + UI).
 3. C-6 Отмена заказа.
@@ -237,8 +259,10 @@
 7. X-3 a11y-полировка: focus-trap в модалках, aria-labels, проверка скринридером.
 8. Sitemap + robots.txt.
 9. Rate limiting (`@nestjs/throttler`).
+10. Customer menu: модальное окно с составом блюда (ingredients + prep time) по клику на карточку.
 
 ### Demo
+
 - Полный flow «забронировал стол + повторил заказ + отменил» работает.
 
 ---
@@ -248,6 +272,7 @@
 **Цель:** Живой URL.
 
 ### Шаги
+
 1. Dockerfile для `web` (SSR) и `api`.
 2. `render.yaml` blueprint.
 3. MongoDB Atlas M0 cluster, IP allowlist `0.0.0.0/0`, user, connection string.
@@ -258,9 +283,11 @@
 8. Сидер запускается при первом старте (если БД пустая).
 
 ### Demo
+
 - Откидываем ссылку → всё работает.
 
 ### Acceptance
+
 - [ ] Cold start < 30 сек (Render free tier засыпает после 15 мин).
 - [ ] Lighthouse на проде ≥ 85 / 90 / 90 / 95.
 
@@ -271,6 +298,7 @@
 **Цель:** Полишинг.
 
 ### Шаги
+
 1. G-7 i18n (ru/en).
 2. G-8 Тёмная тема.
 3. X-4 `withViewTransitions()`.
@@ -285,6 +313,7 @@
 **Цель:** A-9 — двунаправленный канал админ↔гость.
 
 ### Шаги
+
 1. Nest: `@WebSocketGateway` с namespace `/notifications`.
 2. Auth handshake: при connect — проверка JWT из cookie.
 3. Rooms по `userId`.
@@ -294,9 +323,11 @@
 7. На стороне админа: список отправленных уведомлений со статусом «доставлено / прочитано».
 
 ### Demo
+
 - Админ кликает «пинг гостя N» → у гостя моментально toast → клик «ок» → у админа меняется статус на «прочитано».
 
 ### Acceptance
+
 - [ ] Канал двунаправленный (видно в Network → WS).
 - [ ] При обрыве — auto-reconnect.
 - [ ] Сохранён JWT-auth на handshake.
@@ -323,16 +354,16 @@ Iter 10 ▒▒▒▒▒▒▒▒▒▒▒  WebSocket finale
 
 ## State management по итерациям (быстрая справка)
 
-| Iter | Что появляется в state-слое |
-|---|---|
-| 0 | Установлен `@ngrx/signals`, заведены пустые libs `state` и `state-features` |
-| 1 | Только локальные сигналы в компонентах + `httpResource` для меню |
-| 2 | **Первые stores:** `AuthStore`, `CartStore`. Кастомная feature `withStorage`. Redux DevTools работает |
-| 3 | `UserOrdersStore` с `withEntities` + `rxMethod` для SSE |
-| 4 | `AdminOrdersStore` — самый «фичеёмкий»: entities + rxMethod + optimistic-update + computed-счётчики |
-| 5 | `AdminMenuStore` с `withEntities<Dish>` |
-| 6 | Дашборд — `httpResource` без store (read-only данные) |
-| 10 | `NotificationsStore` (WS) — bidirectional через WebSocket, с подтверждениями получения |
+| Iter | Что появляется в state-слое                                                                           |
+| ---- | ----------------------------------------------------------------------------------------------------- |
+| 0    | Установлен `@ngrx/signals`, заведены пустые libs `state` и `state-features`                           |
+| 1    | Только локальные сигналы в компонентах + `httpResource` для меню                                      |
+| 2    | **Первые stores:** `AuthStore`, `CartStore`. Кастомная feature `withStorage`. Redux DevTools работает |
+| 3    | `UserOrdersStore` с `withEntities` + `rxMethod` для SSE                                               |
+| 4    | `AdminOrdersStore` — самый «фичеёмкий»: entities + rxMethod + optimistic-update + computed-счётчики   |
+| 5    | `AdminMenuStore` с `withEntities<Dish>`                                                               |
+| 6    | Дашборд — `httpResource` без store (read-only данные)                                                 |
+| 10   | `NotificationsStore` (WS) — bidirectional через WebSocket, с подтверждениями получения                |
 
 ## Что делать, если в процессе появляются новые идеи
 
