@@ -1,0 +1,179 @@
+<section class="rp-menu-form">
+  <header class="rp-menu-form__header">
+    <a mat-icon-button routerLink="/admin/menu" aria-label="Back to menu">
+      <mat-icon fontSet="material-symbols-outlined">arrow_back</mat-icon>
+    </a>
+    <h1>{{ heading() }}</h1>
+  </header>
+
+  @if (submitting()) {
+  <mat-progress-bar mode="indeterminate" />
+  } @if (serverError(); as msg) {
+  <div class="rp-menu-form__error">
+    <mat-icon fontSet="material-symbols-outlined">error</mat-icon>
+    <span>{{ msg }}</span>
+  </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="rp-menu-form__form">
+    <div class="rp-menu-form__row">
+      <mat-form-field appearance="outline" class="rp-menu-form__name">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" maxlength="120" />
+        @if (form.controls.name.touched &&
+        form.controls.name.errors?.['required']) {
+        <mat-error>Name is required.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="category">
+          @for (cat of categories; track cat) {
+          <mat-option [value]="cat">{{ cat }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        rows="3"
+        maxlength="500"
+      ></textarea>
+      @if (form.controls.description.touched &&
+      form.controls.description.errors?.['required']) {
+      <mat-error>Description is required.</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="rp-menu-form__row">
+      <mat-form-field appearance="outline">
+        <mat-label>Price (EUR)</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="price"
+          min="0"
+          step="0.5"
+        />
+        @if (form.controls.price.touched && form.controls.price.errors?.['min'])
+        {
+        <mat-error>Price must be ≥ 0.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="rp-menu-form__image">
+        <mat-label>Image URL</mat-label>
+        <input matInput formControlName="imageUrl" maxlength="500" />
+        <button
+          matIconSuffix
+          mat-icon-button
+          type="button"
+          (click)="useRandomPicsum()"
+          matTooltip="Use a random Picsum photo"
+          aria-label="Use a random Picsum photo"
+        >
+          <mat-icon fontSet="material-symbols-outlined">shuffle</mat-icon>
+        </button>
+        @if (form.controls.imageUrl.touched &&
+        form.controls.imageUrl.errors?.['required']) {
+        <mat-error>Image URL is required.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    @if (previewUrl(); as url) {
+    <figure class="rp-menu-form__preview">
+      <img
+        [src]="url"
+        alt="Dish image preview"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        (error)="onPreviewError()"
+      />
+    </figure>
+    }
+
+    <rp-ingredients-input formControlName="ingredients" />
+
+    <fieldset class="rp-menu-form__prep">
+      <legend>Prep time</legend>
+
+      <mat-checkbox formControlName="hasRange">
+        Use a range (min–max)
+      </mat-checkbox>
+
+      @if (hasRangeControl.value) {
+      <mat-slider
+        class="rp-menu-form__slider"
+        [min]="prepMin"
+        [max]="prepMax"
+        [step]="prepStep"
+        discrete
+      >
+        <input
+          matSliderStartThumb
+          [value]="prepTimeMinControl.value"
+          (valueChange)="prepTimeMinControl.setValue($event)"
+        />
+        <input
+          matSliderEndThumb
+          [value]="prepTimeMaxControl.value ?? prepTimeMinControl.value"
+          (valueChange)="prepTimeMaxControl.setValue($event)"
+        />
+      </mat-slider>
+      } @else {
+      <mat-slider
+        class="rp-menu-form__slider"
+        [min]="prepMin"
+        [max]="prepMax"
+        [step]="prepStep"
+        discrete
+      >
+        <input
+          matSliderThumb
+          [value]="prepTimeMinControl.value"
+          (valueChange)="prepTimeMinControl.setValue($event)"
+        />
+      </mat-slider>
+      }
+
+      <p class="rp-menu-form__summary">{{ prepTimeSummary() }}</p>
+      @if (form.errors?.['prepTimeRange']) {
+      <p class="rp-menu-form__range-error">
+        Max must be greater than or equal to min.
+      </p>
+      }
+      <p class="rp-menu-form__hint">
+        Allowed: {{ prepMin }}–{{ prepMax }} minutes, step {{ prepStep }}.
+      </p>
+    </fieldset>
+
+    <mat-checkbox formControlName="isAvailable">
+      Available for ordering
+    </mat-checkbox>
+
+    <div class="rp-menu-form__actions">
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="cancel()"
+        [disabled]="submitting()"
+      >
+        Cancel
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="submitting() || form.invalid"
+      >
+        {{ isEdit() ? 'Save changes' : 'Create dish' }}
+      </button>
+    </div>
+  </form>
+</section>

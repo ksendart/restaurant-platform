@@ -52,8 +52,10 @@ export class AdminMenuPage {
   protected readonly archiveFilter = signal<ArchiveFilter>('active');
   protected readonly categoryFilter = signal<CategoryFilter>('all');
   protected readonly searchTerm = signal('');
+  protected readonly expandedId = signal<string | null>(null);
 
   protected readonly displayedColumns = [
+    'expand',
     'name',
     'category',
     'price',
@@ -61,6 +63,7 @@ export class AdminMenuPage {
     'status',
     'actions',
   ] as const;
+  protected readonly detailColumns = ['detail'] as const;
 
   protected readonly filteredDishes = computed<AdminDishDto[]>(() => {
     const all = this.store.dishes();
@@ -101,5 +104,13 @@ export class AdminMenuPage {
     return dish.prepTimeMax === null || dish.prepTimeMax === dish.prepTimeMin
       ? `${dish.prepTimeMin} min`
       : `${dish.prepTimeMin}–${dish.prepTimeMax} min`;
+  }
+
+  protected toggleExpand(dish: AdminDishDto): void {
+    this.expandedId.update((current) => (current === dish.id ? null : dish.id));
+  }
+
+  protected isExpanded(dish: AdminDishDto): boolean {
+    return this.expandedId() === dish.id;
   }
 }

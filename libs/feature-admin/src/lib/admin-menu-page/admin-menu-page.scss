@@ -54,6 +54,11 @@
 
   &__table {
     width: 100%;
+
+    .mat-mdc-row .mat-mdc-cell,
+    .mat-mdc-header-row .mat-mdc-header-cell {
+      border-bottom-color: rgba(0, 0, 0, 0.06);
+    }
   }
 
   &__name {
@@ -78,6 +83,70 @@
   &__actions-col {
     width: 120px;
     text-align: right;
+  }
+
+  &__expand-col {
+    width: 48px;
+    padding-right: 0;
+  }
+
+  &__detail-row {
+    height: 0;
+
+    td {
+      border-bottom: none;
+      padding: 0;
+    }
+  }
+
+  &__detail-cell {
+    padding: 0 !important;
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  &__detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    gap: 16px 24px;
+    padding: 16px 24px;
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+    }
+
+    p {
+      margin: 4px 0 0;
+    }
+  }
+
+  &__detail-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__detail-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(0, 0, 0, 0.55);
+  }
+
+  &__detail-empty {
+    color: rgba(0, 0, 0, 0.5);
+    font-style: italic;
+  }
+
+  &__ingredients {
+    margin: 4px 0 0;
+    padding-left: 18px;
+
+    li {
+      margin: 2px 0;
+    }
+  }
+
+  &__row--expanded td {
+    border-bottom-color: transparent;
   }
 
   &__badge {

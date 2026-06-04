@@ -1,0 +1,21 @@
+<mat-form-field appearance="outline" class="rp-ingredients">
+  <mat-label>Ingredients</mat-label>
+  <mat-chip-grid #grid [disabled]="disabled()" aria-label="Ingredient list">
+    @for (item of items(); track item) {
+    <mat-chip-row (removed)="remove(item)">
+      {{ item }}
+      <button matChipRemove type="button" [attr.aria-label]="'Remove ' + item">
+        <mat-icon fontSet="material-symbols-outlined">cancel</mat-icon>
+      </button>
+    </mat-chip-row>
+    }
+    <input
+      placeholder="Type an ingredient and press Enter"
+      [matChipInputFor]="grid"
+      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      [matChipInputAddOnBlur]="true"
+      (matChipInputTokenEnd)="add($event)"
+    />
+  </mat-chip-grid>
+  <mat-hint>Press Enter or comma to add. Click × to remove.</mat-hint>
+</mat-form-field>
