@@ -28,6 +28,7 @@ export interface CreateOrderRequest {
 
 export interface OrderDto {
   id: string;
+  userId?: string;
   items: OrderItemDto[];
   contact: OrderContact;
   pickupSlot: string;
@@ -40,3 +41,7 @@ export interface OrderStreamEvent {
   id: string;
   status: OrderStatus;
 }
+
+export type AdminOrderStreamEvent =
+  | { type: 'created'; order: OrderDto }
+  | { type: 'status'; id: string; status: OrderStatus };
