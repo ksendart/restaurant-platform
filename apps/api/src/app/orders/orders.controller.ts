@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Param,
-  Patch,
   Post,
   Sse,
   UseGuards,
@@ -16,7 +15,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtSseAuthGuard } from '../auth/jwt-sse-auth.guard';
 import { AuthenticatedUser } from '../auth/jwt.strategy';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import {
   ORDER_STATUS_CHANGED,
   OrderStatusChangedEvent,
@@ -72,16 +70,5 @@ export class OrdersController {
     @Param('id') id: string
   ): Promise<OrderDto> {
     return this.ordersService.findOneForUser(id, user.id);
-  }
-
-  // TODO(Iter 4): move to admin controller behind RolesGuard('admin').
-  // Temporary endpoint for manual SSE testing via curl.
-  @Patch(':id/status')
-  @UseGuards(JwtAuthGuard)
-  updateStatus(
-    @Param('id') id: string,
-    @Body() dto: UpdateOrderStatusDto
-  ): Promise<OrderDto> {
-    return this.ordersService.updateStatus(id, dto.status);
   }
 }
