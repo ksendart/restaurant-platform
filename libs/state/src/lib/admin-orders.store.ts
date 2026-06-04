@@ -9,17 +9,24 @@ import {
   withState,
 } from '@ngrx/signals';
 import {
+  addEntity,
   entityConfig,
   setAllEntities,
   updateEntity,
-  upsertEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { withDevtools } from '@angular-architects/ngrx-toolkit';
-import { OrdersApi } from '@restaurant-platform/data-access-orders';
-import { SseStatus, UserSseClient } from '@restaurant-platform/data-access-sse';
-import { OrderDto, OrderStreamEvent } from '@restaurant-platform/shared-types';
+import { AdminOrdersApi } from '@restaurant-platform/data-access-orders';
+import {
+  AdminSseClient,
+  SseStatus,
+} from '@restaurant-platform/data-access-sse';
+import {
+  AdminOrderStreamEvent,
+  OrderDto,
+  OrderStatus,
+} from '@restaurant-platform/shared-types';
 import {
   EMPTY,
   catchError,
@@ -31,22 +38,22 @@ import {
 } from 'rxjs';
 import { AuthStore } from './auth.store';
 
-export type UserOrdersStatus = 'idle' | 'loading' | 'ready' | 'error';
+export type AdminOrdersStatus = 'idle' | 'loading' | 'ready' | 'error';
 
-interface UserOrdersState {
-  status: UserOrdersStatus;
+interface AdminOrdersState {
+  status: AdminOrdersStatus;
   lastError: string | null;
   sseConnected: boolean;
 }
 
-const initialState: UserOrdersState = {
+const initialState: AdminOrdersState = {
   status: 'idle',
   lastError: null,
   sseConnected: false,
 };
 
 const SSE_RECONNECT_GRACE_MS = 3_000;
-const SSE_URL = '/api/orders/stream';
+const SSE_URL = '/api/admin/orders/stream';
 
 const orderEntity = entityConfig({
   entity: type<OrderDto>(),
@@ -54,26 +61,37 @@ const orderEntity = entityConfig({
   selectId: (order) => order.id,
 });
 
-export const UserOrdersStore = signalStore(
+export const AdminOrdersStore = signalStore(
   { providedIn: 'root' },
-  withDevtools('user-orders'),
+  withDevtools('admin-orders'),
   withState(initialState),
   withEntities(orderEntity),
   withComputed(({ ordersEntities }) => ({
     orders: computed(() => ordersEntities()),
+    pendingCount: computed(
+      () =>
+        ordersEntities().filter((order) => order.status === 'pending').length
+    ),
+    preparingCount: computed(
+      () =>
+        ordersEntities().filter((order) => order.status === 'preparing').length
+    ),
+    readyCount: computed(
+      () => ordersEntities().filter((order) => order.status === 'ready').length
+    ),
   })),
   withMethods(
     (
       store,
-      ordersApi = inject(OrdersApi),
-      sseClient = inject(UserSseClient),
+      adminOrdersApi = inject(AdminOrdersApi),
+      sseClient = inject(AdminSseClient),
       authStore = inject(AuthStore)
     ) => {
       const loadAll = rxMethod<void>(
         pipe(
           tap(() => patchState(store, { status: 'loading', lastError: null })),
           switchMap(() =>
-            ordersApi.list().pipe(
+            adminOrdersApi.list().pipe(
               tap((orders) => {
                 patchState(store, setAllEntities(orders, orderEntity), {
                   status: 'ready',
@@ -91,29 +109,20 @@ export const UserOrdersStore = signalStore(
         )
       );
 
-      const loadOne = rxMethod<string>(
-        pipe(
-          switchMap((id) =>
-            ordersApi.getById(id).pipe(
-              tap((order) => {
-                patchState(store, upsertEntity(order, orderEntity));
-              }),
-              catchError(() => EMPTY)
-            )
-          )
-        )
-      );
-
-      const subscribeToStream = rxMethod<OrderStreamEvent>(
+      const subscribeToStream = rxMethod<AdminOrderStreamEvent>(
         pipe(
           tap((event) => {
-            patchState(
-              store,
-              updateEntity(
-                { id: event.id, changes: { status: event.status } },
-                orderEntity
-              )
-            );
+            if (event.type === 'created') {
+              patchState(store, addEntity(event.order, orderEntity));
+            } else {
+              patchState(
+                store,
+                updateEntity(
+                  { id: event.id, changes: { status: event.status } },
+                  orderEntity
+                )
+              );
+            }
           })
         )
       );
@@ -125,7 +134,7 @@ export const UserOrdersStore = signalStore(
           ),
           filter((status) => status === 'disconnected'),
           debounceTime(SSE_RECONNECT_GRACE_MS),
-          filter(() => authStore.user() !== null),
+          filter(() => authStore.isAdmin()),
           switchMap(() =>
             authStore.refresh().pipe(
               tap(() => sseClient.connect(SSE_URL)),
@@ -146,6 +155,35 @@ export const UserOrdersStore = signalStore(
         patchState(store, { sseConnected: false });
       }
 
+      function changeStatus(id: string, status: OrderStatus): void {
+        const current = store.ordersEntityMap()[id];
+        if (!current) {
+          return;
+        }
+        const previousStatus = current.status;
+        patchState(
+          store,
+          updateEntity({ id, changes: { status } }, orderEntity)
+        );
+
+        adminOrdersApi
+          .updateStatus(id, status)
+          .pipe(
+            catchError(() => {
+              patchState(
+                store,
+                updateEntity(
+                  { id, changes: { status: previousStatus } },
+                  orderEntity
+                ),
+                { lastError: 'Failed to update status' }
+              );
+              return EMPTY;
+            })
+          )
+          .subscribe();
+      }
+
       function reset(): void {
         patchState(
           store,
@@ -156,9 +194,9 @@ export const UserOrdersStore = signalStore(
 
       return {
         loadAll,
-        loadOne,
         startStream,
         stopStream,
+        changeStatus,
         reset,
       };
     }
@@ -166,9 +204,9 @@ export const UserOrdersStore = signalStore(
   withHooks({
     onInit(store, authStore = inject(AuthStore)) {
       effect(() => {
-        const user = authStore.user();
+        const isAdmin = authStore.isAdmin();
         untracked(() => {
-          if (user) {
+          if (isAdmin) {
             store.loadAll();
             store.startStream();
           } else {

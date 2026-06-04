@@ -10,7 +10,7 @@ import { Observable, Subject } from 'rxjs';
 
 export type SseStatus = 'connected' | 'disconnected';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class SseClient<T> {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly destroyRef = inject(DestroyRef);
