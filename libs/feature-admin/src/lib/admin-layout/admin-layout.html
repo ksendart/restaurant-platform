@@ -13,34 +13,26 @@
       <span>Admin</span>
     </div>
 
-    <mat-divider></mat-divider>
-
-    <mat-nav-list>
+    <nav class="rp-admin__nav" aria-label="Admin navigation">
       <a
-        mat-list-item
+        class="rp-admin__nav-link"
         routerLink="/admin/orders"
-        routerLinkActive="rp-admin__link--active"
+        routerLinkActive="rp-admin__nav-link--active"
         (click)="closeSidenavOnMobile()"
       >
-        <mat-icon matListItemIcon fontSet="material-symbols-outlined"
-          >receipt_long</mat-icon
-        >
-        <span matListItemTitle>Orders</span>
+        <mat-icon fontSet="material-symbols-outlined">receipt_long</mat-icon>
+        <span class="rp-admin__nav-label">Orders</span>
         @if (adminOrders.pendingCount() > 0) {
-        <span class="rp-admin__badge" matListItemMeta>
-          {{ adminOrders.pendingCount() }}
-        </span>
+        <span class="rp-admin__badge">{{ adminOrders.pendingCount() }}</span>
         }
       </a>
 
-      <a mat-list-item disabled>
-        <mat-icon matListItemIcon fontSet="material-symbols-outlined"
-          >restaurant_menu</mat-icon
-        >
-        <span matListItemTitle>Menu</span>
-        <span class="rp-admin__soon" matListItemMeta>soon</span>
-      </a>
-    </mat-nav-list>
+      <span class="rp-admin__nav-link rp-admin__nav-link--disabled">
+        <mat-icon fontSet="material-symbols-outlined">restaurant_menu</mat-icon>
+        <span class="rp-admin__nav-label">Menu</span>
+        <span class="rp-admin__soon">soon</span>
+      </span>
+    </nav>
 
     <div class="rp-admin__footer">
       <span class="rp-admin__email">{{ auth.user()?.email }}</span>
@@ -52,7 +44,6 @@
   </mat-sidenav>
 
   <mat-sidenav-content class="rp-admin__content">
-    @if (isHandset()) {
     <mat-toolbar class="rp-admin__toolbar">
       <button
         mat-icon-button
@@ -62,9 +53,7 @@
       >
         <mat-icon fontSet="material-symbols-outlined">menu</mat-icon>
       </button>
-      <span class="rp-admin__toolbar-title">Admin</span>
     </mat-toolbar>
-    }
     <div class="rp-admin__outlet">
       <router-outlet />
     </div>

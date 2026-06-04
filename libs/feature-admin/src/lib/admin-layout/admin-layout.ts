@@ -17,9 +17,7 @@ import {
 } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { map } from 'rxjs';
@@ -32,9 +30,7 @@ import { AdminOrdersStore, AuthStore } from '@restaurant-platform/state';
     RouterLinkActive,
     RouterOutlet,
     MatButtonModule,
-    MatDividerModule,
     MatIconModule,
-    MatListModule,
     MatSidenavModule,
     MatToolbarModule,
   ],

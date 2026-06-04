@@ -91,7 +91,10 @@ export class RegisterPage {
     effect(() => {
       if (this.submitted() && this.authStore.isAuthorized()) {
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-        void this.router.navigateByUrl(returnUrl ?? '/menu');
+        const target = this.authStore.isAdmin()
+          ? '/admin/orders'
+          : returnUrl ?? '/menu';
+        void this.router.navigateByUrl(target);
       }
     });
   }

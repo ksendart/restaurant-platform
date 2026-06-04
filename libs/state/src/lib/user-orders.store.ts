@@ -1,4 +1,4 @@
-import { computed, effect, inject, untracked } from '@angular/core';
+import { Injector, computed, effect, inject, untracked } from '@angular/core';
 import {
   patchState,
   signalStore,
@@ -67,7 +67,8 @@ export const UserOrdersStore = signalStore(
       store,
       ordersApi = inject(OrdersApi),
       sseClient = inject(UserSseClient),
-      authStore = inject(AuthStore)
+      authStore = inject(AuthStore),
+      injector = inject(Injector)
     ) => {
       const loadAll = rxMethod<void>(
         pipe(
@@ -137,8 +138,8 @@ export const UserOrdersStore = signalStore(
 
       function startStream(): void {
         sseClient.connect(SSE_URL);
-        subscribeToStream(sseClient.messages$);
-        trackConnection(sseClient.status$);
+        subscribeToStream(sseClient.messages$, { injector });
+        trackConnection(sseClient.status$, { injector });
       }
 
       function stopStream(): void {
@@ -167,8 +168,9 @@ export const UserOrdersStore = signalStore(
     onInit(store, authStore = inject(AuthStore)) {
       effect(() => {
         const user = authStore.user();
+        const isAdmin = authStore.isAdmin();
         untracked(() => {
-          if (user) {
+          if (user && !isAdmin) {
             store.loadAll();
             store.startStream();
           } else {

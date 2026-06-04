@@ -1,4 +1,4 @@
-import { computed, effect, inject, untracked } from '@angular/core';
+import { Injector, computed, effect, inject, untracked } from '@angular/core';
 import {
   patchState,
   signalStore,
@@ -24,6 +24,7 @@ import {
 } from '@restaurant-platform/data-access-sse';
 import {
   AdminOrderStreamEvent,
+  ORDER_STATUSES,
   OrderDto,
   OrderStatus,
 } from '@restaurant-platform/shared-types';
@@ -65,26 +66,31 @@ export const AdminOrdersStore = signalStore(
   withDevtools('admin-orders'),
   withState(initialState),
   withEntities(orderEntity),
-  withComputed(({ ordersEntities }) => ({
-    orders: computed(() => ordersEntities()),
-    pendingCount: computed(
-      () =>
-        ordersEntities().filter((order) => order.status === 'pending').length
-    ),
-    preparingCount: computed(
-      () =>
-        ordersEntities().filter((order) => order.status === 'preparing').length
-    ),
-    readyCount: computed(
-      () => ordersEntities().filter((order) => order.status === 'ready').length
-    ),
-  })),
+  withComputed(({ ordersEntities }) => {
+    const countsByStatus = computed(() => {
+      const counts = Object.fromEntries(
+        ORDER_STATUSES.map((status) => [status, 0])
+      ) as Record<OrderStatus, number>;
+      for (const order of ordersEntities()) {
+        counts[order.status] += 1;
+      }
+      return counts;
+    });
+    return {
+      orders: computed(() => ordersEntities()),
+      countsByStatus,
+      pendingCount: computed(() => countsByStatus().pending),
+      preparingCount: computed(() => countsByStatus().preparing),
+      readyCount: computed(() => countsByStatus().ready),
+    };
+  }),
   withMethods(
     (
       store,
       adminOrdersApi = inject(AdminOrdersApi),
       sseClient = inject(AdminSseClient),
-      authStore = inject(AuthStore)
+      authStore = inject(AuthStore),
+      injector = inject(Injector)
     ) => {
       const loadAll = rxMethod<void>(
         pipe(
@@ -145,8 +151,8 @@ export const AdminOrdersStore = signalStore(
 
       function startStream(): void {
         sseClient.connect(SSE_URL);
-        subscribeToStream(sseClient.messages$);
-        trackConnection(sseClient.status$);
+        subscribeToStream(sseClient.messages$, { injector });
+        trackConnection(sseClient.status$, { injector });
       }
 
       function stopStream(): void {

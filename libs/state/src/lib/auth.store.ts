@@ -173,12 +173,13 @@ export const AuthStore = signalStore(
 
     const logout = rxMethod<void>(
       pipe(
-        switchMap(() =>
-          authApi.logout().pipe(
-            catchError(() => of(void 0)),
-            tap(() => applyGuest())
-          )
-        )
+        switchMap(() => {
+          const token = store.accessToken();
+          applyGuest();
+          return authApi
+            .logout(token ?? undefined)
+            .pipe(catchError(() => of(void 0)));
+        })
       )
     );
 

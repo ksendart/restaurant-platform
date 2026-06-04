@@ -1,0 +1,123 @@
+<header class="rp-admin-orders__header">
+  <h1 class="rp-admin-orders__title">Orders</h1>
+  <span
+    class="rp-admin-orders__live"
+    [attr.data-connected]="adminOrders.sseConnected()"
+  >
+    <span class="rp-admin-orders__live-dot"></span>
+    {{ adminOrders.sseConnected() ? 'Live' : 'Offline' }}
+  </span>
+</header>
+
+@if (adminOrders.status() === 'loading') {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-chip-listbox
+  class="rp-admin-orders__filters"
+  [value]="filter()"
+  (change)="setFilter($event.value)"
+  hideSingleSelectionIndicator
+>
+  <mat-chip-option value="all" [selected]="filter() === 'all'">
+    All
+    <span class="rp-admin-orders__chip-count">
+      {{ adminOrders.ordersEntities().length }}
+    </span>
+  </mat-chip-option>
+  @for (status of statuses; track status) {
+  <mat-chip-option [value]="status" [selected]="filter() === status">
+    {{ status }}
+    <span class="rp-admin-orders__chip-count">{{ countFor(status) }}</span>
+  </mat-chip-option>
+  }
+</mat-chip-listbox>
+
+@switch (adminOrders.status()) { @case ('error') {
+<div class="rp-admin-orders__banner" role="alert">
+  <mat-icon fontSet="material-symbols-outlined">error</mat-icon>
+  <span>{{ adminOrders.lastError() ?? 'Failed to load orders' }}</span>
+  <button mat-stroked-button type="button" (click)="retry()">Try again</button>
+</div>
+} @default { @if (filteredOrders().length === 0 && adminOrders.status() !==
+'loading') {
+<div class="rp-admin-orders__empty">
+  <mat-icon fontSet="material-symbols-outlined">inbox</mat-icon>
+  <p>No orders matching this filter.</p>
+</div>
+} @else {
+<ul class="rp-admin-orders__list">
+  @for (order of filteredOrders(); track order.id) {
+  <li class="rp-admin-orders__card">
+    <div class="rp-admin-orders__card-head">
+      <span class="rp-admin-orders__card-id">#{{ shortId(order.id) }}</span>
+      <span class="rp-admin-orders__status" [attr.data-status]="order.status">
+        {{ order.status }}
+      </span>
+      <span class="rp-admin-orders__card-date">
+        {{ order.createdAt | date : 'short' }}
+      </span>
+    </div>
+
+    <div class="rp-admin-orders__customer">
+      <span class="rp-admin-orders__customer-field">
+        <mat-icon fontSet="material-symbols-outlined">person</mat-icon>
+        <span>{{ order.contact.name }}</span>
+      </span>
+      <div class="rp-admin-orders__customer-contacts">
+        <span class="rp-admin-orders__customer-field">
+          <mat-icon fontSet="material-symbols-outlined">call</mat-icon>
+          <span>{{ order.contact.phone }}</span>
+        </span>
+        <span class="rp-admin-orders__customer-field">
+          <mat-icon fontSet="material-symbols-outlined">mail</mat-icon>
+          <span>{{ order.contact.email }}</span>
+        </span>
+      </div>
+    </div>
+
+    <mat-expansion-panel class="rp-admin-orders__items-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          View order ({{ order.items.length }} {{ order.items.length === 1 ?
+          'item' : 'items' }})
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <ul class="rp-admin-orders__items">
+        @for (item of order.items; track item.dishId) {
+        <li>
+          <span>{{ item.name }}</span>
+          <span class="rp-admin-orders__item-count">× {{ item.count }}</span>
+        </li>
+        }
+      </ul>
+    </mat-expansion-panel>
+
+    <div class="rp-admin-orders__meta">
+      <span>
+        <mat-icon fontSet="material-symbols-outlined">schedule</mat-icon>
+        Pickup {{ order.pickupSlot }}
+      </span>
+      <span class="rp-admin-orders__total">
+        {{ order.total | currency : 'USD' : 'symbol' : '1.2-2' }}
+      </span>
+    </div>
+
+    @if (actionsFor(order.status).length > 0) {
+    <div class="rp-admin-orders__actions">
+      @for (action of actionsFor(order.status); track action.next) {
+      <button
+        mat-stroked-button
+        type="button"
+        [attr.data-action]="action.next"
+        (click)="changeStatus(order.id, action.next)"
+      >
+        {{ action.label }}
+      </button>
+      }
+    </div>
+    }
+  </li>
+  }
+</ul>
+} } }
