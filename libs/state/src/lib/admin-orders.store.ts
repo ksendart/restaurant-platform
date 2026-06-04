@@ -45,15 +45,18 @@ interface AdminOrdersState {
   status: AdminOrdersStatus;
   lastError: string | null;
   sseConnected: boolean;
+  freshIds: ReadonlySet<string>;
 }
 
 const initialState: AdminOrdersState = {
   status: 'idle',
   lastError: null,
   sseConnected: false,
+  freshIds: new Set<string>(),
 };
 
 const SSE_RECONNECT_GRACE_MS = 3_000;
+const FRESH_HIGHLIGHT_MS = 8_000;
 const SSE_URL = '/api/admin/orders/stream';
 
 const orderEntity = entityConfig({
@@ -114,11 +117,23 @@ export const AdminOrdersStore = signalStore(
         )
       );
 
+      function markFresh(id: string): void {
+        const next = new Set(store.freshIds());
+        next.add(id);
+        patchState(store, { freshIds: next });
+        setTimeout(() => {
+          const current = new Set(store.freshIds());
+          current.delete(id);
+          patchState(store, { freshIds: current });
+        }, FRESH_HIGHLIGHT_MS);
+      }
+
       const subscribeToStream = rxMethod<AdminOrderStreamEvent>(
         pipe(
           tap((event) => {
             if (event.type === 'created') {
               patchState(store, addEntity(event.order, orderEntity));
+              markFresh(event.order.id);
             } else {
               patchState(
                 store,

@@ -92,6 +92,35 @@
   padding: 1rem;
   display: grid;
   gap: 0.6rem;
+  animation: rp-admin-orders-card-in 280ms ease-out both;
+}
+
+.rp-admin-orders__card--fresh {
+  border-color: rgba(76, 175, 80, 0.7);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.18);
+  animation: rp-admin-orders-card-in 280ms ease-out both,
+    rp-admin-orders-card-pulse 1.6s ease-in-out 280ms 3;
+}
+
+@keyframes rp-admin-orders-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rp-admin-orders-card-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.35);
+  }
 }
 
 .rp-admin-orders__card-head {

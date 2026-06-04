@@ -48,7 +48,10 @@
 } @else {
 <ul class="rp-admin-orders__list">
   @for (order of filteredOrders(); track order.id) {
-  <li class="rp-admin-orders__card">
+  <li
+    class="rp-admin-orders__card"
+    [class.rp-admin-orders__card--fresh]="adminOrders.freshIds().has(order.id)"
+  >
     <div class="rp-admin-orders__card-head">
       <span class="rp-admin-orders__card-id">#{{ shortId(order.id) }}</span>
       <span class="rp-admin-orders__status" [attr.data-status]="order.status">

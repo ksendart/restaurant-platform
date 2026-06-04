@@ -62,9 +62,9 @@ export class AdminOrdersPage {
   protected readonly filteredOrders = computed<OrderDto[]>(() => {
     const current = this.filter();
     const all = this.adminOrders.ordersEntities();
-    return current === 'all'
-      ? all
-      : all.filter((order) => order.status === current);
+    const filtered =
+      current === 'all' ? all : all.filter((order) => order.status === current);
+    return [...filtered].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   });
 
   protected setFilter(value: AdminFilter): void {

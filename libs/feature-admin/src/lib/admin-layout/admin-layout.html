@@ -53,6 +53,20 @@
       >
         <mat-icon fontSet="material-symbols-outlined">menu</mat-icon>
       </button>
+      <span class="rp-admin__toolbar-spacer"></span>
+      <button
+        mat-icon-button
+        type="button"
+        (click)="toggleSound()"
+        [attr.aria-label]="
+          soundEnabled() ? 'Mute new order sound' : 'Unmute new order sound'
+        "
+        [attr.aria-pressed]="soundEnabled()"
+      >
+        <mat-icon fontSet="material-symbols-outlined">
+          {{ soundEnabled() ? 'notifications_active' : 'notifications_off' }}
+        </mat-icon>
+      </button>
     </mat-toolbar>
     <div class="rp-admin__outlet">
       <router-outlet />
