@@ -62,7 +62,6 @@ const orderEntity = entityConfig({
 });
 
 export const AdminOrdersStore = signalStore(
-  { providedIn: 'root' },
   withDevtools('admin-orders'),
   withState(initialState),
   withEntities(orderEntity),

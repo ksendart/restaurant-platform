@@ -30,6 +30,7 @@
       "@restaurant-platform/feature-account": [
         "libs/feature-account/src/index.ts"
       ],
+      "@restaurant-platform/feature-admin": ["libs/feature-admin/src/index.ts"],
       "@restaurant-platform/feature-auth": ["libs/feature-auth/src/index.ts"],
       "@restaurant-platform/feature-checkout": [
         "libs/feature-checkout/src/index.ts"

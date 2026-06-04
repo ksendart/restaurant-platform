@@ -1,0 +1,72 @@
+<mat-sidenav-container class="rp-admin">
+  <mat-sidenav
+    class="rp-admin__sidenav"
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+    (openedChange)="sidenavOpened.set($event)"
+    [fixedInViewport]="false"
+  >
+    <div class="rp-admin__brand">
+      <mat-icon fontSet="material-symbols-outlined"
+        >admin_panel_settings</mat-icon
+      >
+      <span>Admin</span>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <mat-nav-list>
+      <a
+        mat-list-item
+        routerLink="/admin/orders"
+        routerLinkActive="rp-admin__link--active"
+        (click)="closeSidenavOnMobile()"
+      >
+        <mat-icon matListItemIcon fontSet="material-symbols-outlined"
+          >receipt_long</mat-icon
+        >
+        <span matListItemTitle>Orders</span>
+        @if (adminOrders.pendingCount() > 0) {
+        <span class="rp-admin__badge" matListItemMeta>
+          {{ adminOrders.pendingCount() }}
+        </span>
+        }
+      </a>
+
+      <a mat-list-item disabled>
+        <mat-icon matListItemIcon fontSet="material-symbols-outlined"
+          >restaurant_menu</mat-icon
+        >
+        <span matListItemTitle>Menu</span>
+        <span class="rp-admin__soon" matListItemMeta>soon</span>
+      </a>
+    </mat-nav-list>
+
+    <div class="rp-admin__footer">
+      <span class="rp-admin__email">{{ auth.user()?.email }}</span>
+      <button mat-stroked-button type="button" (click)="signOut()">
+        <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="rp-admin__content">
+    @if (isHandset()) {
+    <mat-toolbar class="rp-admin__toolbar">
+      <button
+        mat-icon-button
+        type="button"
+        (click)="toggleSidenav()"
+        aria-label="Toggle navigation"
+      >
+        <mat-icon fontSet="material-symbols-outlined">menu</mat-icon>
+      </button>
+      <span class="rp-admin__toolbar-title">Admin</span>
+    </mat-toolbar>
+    }
+    <div class="rp-admin__outlet">
+      <router-outlet />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
