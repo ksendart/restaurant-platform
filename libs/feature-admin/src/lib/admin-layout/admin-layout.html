@@ -27,11 +27,15 @@
         }
       </a>
 
-      <span class="rp-admin__nav-link rp-admin__nav-link--disabled">
+      <a
+        class="rp-admin__nav-link"
+        routerLink="/admin/menu"
+        routerLinkActive="rp-admin__nav-link--active"
+        (click)="closeSidenavOnMobile()"
+      >
         <mat-icon fontSet="material-symbols-outlined">restaurant_menu</mat-icon>
         <span class="rp-admin__nav-label">Menu</span>
-        <span class="rp-admin__soon">soon</span>
-      </span>
+      </a>
     </nav>
 
     <div class="rp-admin__footer">
