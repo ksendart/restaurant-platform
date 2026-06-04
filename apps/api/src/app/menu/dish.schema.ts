@@ -3,6 +3,8 @@ import { HydratedDocument } from 'mongoose';
 import {
   DISH_CATEGORIES,
   DishCategory,
+  PREP_TIME_MAX,
+  PREP_TIME_MIN,
 } from '@restaurant-platform/shared-types';
 
 @Schema({ collection: 'dishes', timestamps: true })
@@ -27,6 +29,15 @@ export class Dish {
 
   @Prop({ default: false })
   isArchived!: boolean;
+
+  @Prop({ type: [String], default: [] })
+  ingredients!: string[];
+
+  @Prop({ required: true, min: PREP_TIME_MIN, max: PREP_TIME_MAX })
+  prepTimeMin!: number;
+
+  @Prop({ type: Number, default: null, min: PREP_TIME_MIN, max: PREP_TIME_MAX })
+  prepTimeMax!: number | null;
 }
 
 export type DishDocument = HydratedDocument<Dish>;
