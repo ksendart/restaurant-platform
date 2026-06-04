@@ -16,6 +16,7 @@ import {
   UserOrdersStore,
 } from '@restaurant-platform/state';
 import { OrderDto, OrderStatus } from '@restaurant-platform/shared-types';
+import { OrderNotificationsService } from '../services/order-notifications.service';
 
 const ACTIVE_STATUSES: ReadonlySet<OrderStatus> = new Set([
   'pending',
@@ -43,6 +44,7 @@ const ORDERS_PREVIEW_LIMIT = 3;
 export class MainLayout {
   private readonly router = inject(Router);
   private readonly userOrders = inject(UserOrdersStore);
+  private readonly orderNotifications = inject(OrderNotificationsService);
 
   protected readonly cart = inject(CartStore);
   protected readonly auth = inject(AuthStore);

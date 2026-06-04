@@ -1,11 +1,15 @@
 import { Route } from '@angular/router';
 import { AuthLayout, MainLayout } from '@restaurant-platform/feature-shell';
+import { adminGuard } from './shared/guards/admin.guard';
 import { authGuard } from './shared/guards/auth.guard';
 import { canDeactivateGuard } from './shared/guards/can-deactivate.guard';
+import { customerOnlyGuard } from './shared/guards/customer-only.guard';
+import { guestOnlyGuard } from './shared/guards/guest-only.guard';
 
 export const appRoutes: Route[] = [
   {
     path: '',
+    canMatch: [customerOnlyGuard],
     component: MainLayout,
     children: [
       {
@@ -50,7 +54,14 @@ export const appRoutes: Route[] = [
     ],
   },
   {
+    path: 'admin',
+    canMatch: [adminGuard],
+    loadChildren: () =>
+      import('@restaurant-platform/feature-admin').then((m) => m.adminRoutes),
+  },
+  {
     path: 'auth',
+    canMatch: [guestOnlyGuard],
     component: AuthLayout,
     children: [
       {

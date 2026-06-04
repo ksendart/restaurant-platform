@@ -23,11 +23,10 @@ import {
   withEventReplay,
   withIncrementalHydration,
 } from '@angular/platform-browser';
-import { AuthStore, UserOrdersStore } from '@restaurant-platform/state';
+import { AuthStore } from '@restaurant-platform/state';
 import { appRoutes } from './app.routes';
 import { authInterceptor } from './shared/interceptors/auth.interceptor';
 import { errorInterceptor } from './shared/interceptors/error.interceptor';
-import { OrderNotificationsService } from './shared/services/order-notifications.service';
 import { RpTitleStrategy } from './shared/title-strategy';
 
 export const appConfig: ApplicationConfig = {
@@ -47,8 +46,6 @@ export const appConfig: ApplicationConfig = {
         return;
       }
       const authStore = inject(AuthStore);
-      inject(UserOrdersStore);
-      inject(OrderNotificationsService);
       await authStore.tryRestoreSession();
     }),
   ],

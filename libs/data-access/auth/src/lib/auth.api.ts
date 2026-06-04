@@ -31,11 +31,14 @@ export class AuthApi {
     );
   }
 
-  logout(): Observable<void> {
+  logout(accessToken?: string): Observable<void> {
     return this.http.post<void>(
       '/api/auth/logout',
       {},
-      { withCredentials: true }
+      {
+        withCredentials: true,
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      }
     );
   }
 }

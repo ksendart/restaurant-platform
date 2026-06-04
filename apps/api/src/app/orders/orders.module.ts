@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Dish, DishSchema } from '../menu/dish.schema';
+import { AdminOrdersController } from './admin-orders.controller';
 import { Order, OrderSchema } from './order.schema';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
@@ -12,7 +13,7 @@ import { OrdersService } from './orders.service';
       { name: Dish.name, schema: DishSchema },
     ]),
   ],
-  controllers: [OrdersController],
+  controllers: [OrdersController, AdminOrdersController],
   providers: [OrdersService],
 })
 export class OrdersModule {}

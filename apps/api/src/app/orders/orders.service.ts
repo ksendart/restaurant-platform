@@ -10,6 +10,7 @@ import { Model, Types } from 'mongoose';
 import { OrderDto, OrderStatus } from '@restaurant-platform/shared-types';
 import { Dish } from '../menu/dish.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { ORDER_CREATED, OrderCreatedEvent } from './events/order-created.event';
 import {
   ORDER_STATUS_CHANGED,
   OrderStatusChangedEvent,
@@ -57,11 +58,24 @@ export class OrdersService {
     });
 
     const dto2 = toDto(created);
+    this.eventEmitter.emit(ORDER_CREATED, new OrderCreatedEvent(dto2));
     this.eventEmitter.emit(
       ORDER_STATUS_CHANGED,
       new OrderStatusChangedEvent(dto2.id, userId, dto2.status)
     );
     return dto2;
+  }
+
+  async findAll(status?: OrderStatus): Promise<OrderDto[]> {
+    const filter: Record<string, unknown> = {};
+    if (status) {
+      filter.status = status;
+    }
+    const docs = await this.orderModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .exec();
+    return docs.map(toDto);
   }
 
   async updateStatus(orderId: string, status: OrderStatus): Promise<OrderDto> {
@@ -112,6 +126,7 @@ export class OrdersService {
 function toDto(doc: OrderDocument): OrderDto {
   return {
     id: String(doc._id),
+    userId: String(doc.userId),
     items: doc.items.map((item) => ({
       dishId: String(item.dishId),
       name: item.name,

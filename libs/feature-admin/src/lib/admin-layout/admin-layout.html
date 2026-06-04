@@ -1,0 +1,75 @@
+<mat-sidenav-container class="rp-admin">
+  <mat-sidenav
+    class="rp-admin__sidenav"
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+    (openedChange)="sidenavOpened.set($event)"
+    [fixedInViewport]="false"
+  >
+    <div class="rp-admin__brand">
+      <mat-icon fontSet="material-symbols-outlined"
+        >admin_panel_settings</mat-icon
+      >
+      <span>Admin</span>
+    </div>
+
+    <nav class="rp-admin__nav" aria-label="Admin navigation">
+      <a
+        class="rp-admin__nav-link"
+        routerLink="/admin/orders"
+        routerLinkActive="rp-admin__nav-link--active"
+        (click)="closeSidenavOnMobile()"
+      >
+        <mat-icon fontSet="material-symbols-outlined">receipt_long</mat-icon>
+        <span class="rp-admin__nav-label">Orders</span>
+        @if (adminOrders.pendingCount() > 0) {
+        <span class="rp-admin__badge">{{ adminOrders.pendingCount() }}</span>
+        }
+      </a>
+
+      <span class="rp-admin__nav-link rp-admin__nav-link--disabled">
+        <mat-icon fontSet="material-symbols-outlined">restaurant_menu</mat-icon>
+        <span class="rp-admin__nav-label">Menu</span>
+        <span class="rp-admin__soon">soon</span>
+      </span>
+    </nav>
+
+    <div class="rp-admin__footer">
+      <span class="rp-admin__email">{{ auth.user()?.email }}</span>
+      <button mat-stroked-button type="button" (click)="signOut()">
+        <mat-icon fontSet="material-symbols-outlined">logout</mat-icon>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="rp-admin__content">
+    <mat-toolbar class="rp-admin__toolbar">
+      <button
+        mat-icon-button
+        type="button"
+        (click)="toggleSidenav()"
+        aria-label="Toggle navigation"
+      >
+        <mat-icon fontSet="material-symbols-outlined">menu</mat-icon>
+      </button>
+      <span class="rp-admin__toolbar-spacer"></span>
+      <button
+        mat-icon-button
+        type="button"
+        (click)="toggleSound()"
+        [attr.aria-label]="
+          soundEnabled() ? 'Mute new order sound' : 'Unmute new order sound'
+        "
+        [attr.aria-pressed]="soundEnabled()"
+      >
+        <mat-icon fontSet="material-symbols-outlined">
+          {{ soundEnabled() ? 'notifications_active' : 'notifications_off' }}
+        </mat-icon>
+      </button>
+    </mat-toolbar>
+    <div class="rp-admin__outlet">
+      <router-outlet />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
