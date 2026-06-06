@@ -4,7 +4,11 @@
 
     <mat-form-field appearance="outline" class="rp-admin-dashboard__range">
       <mat-label>Date range</mat-label>
-      <mat-date-range-input [formGroup]="rangeForm" [max]="maxDate">
+      <mat-date-range-input
+        [formGroup]="rangeForm"
+        [rangePicker]="picker"
+        [max]="maxDate"
+      >
         <input matStartDate formControlName="start" placeholder="Start" />
         <input matEndDate formControlName="end" placeholder="End" />
       </mat-date-range-input>
@@ -56,6 +60,28 @@
     <h2 class="rp-admin-dashboard__panel-title">Revenue by day</h2>
     @defer (on viewport; prefetch on idle) {
     <rp-revenue-chart [days]="days()" />
+    } @placeholder {
+    <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
+    } @loading (minimum 100ms) {
+    <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
+    }
+  </section>
+
+  <section class="rp-admin-dashboard__panel">
+    <header class="rp-admin-dashboard__panel-header">
+      <h2 class="rp-admin-dashboard__panel-title">Top dishes</h2>
+      <mat-button-toggle-group
+        hideSingleSelectionIndicator
+        [value]="topMode()"
+        (change)="topMode.set($event.value)"
+        aria-label="Top dishes metric"
+      >
+        <mat-button-toggle value="count">Quantity</mat-button-toggle>
+        <mat-button-toggle value="revenue">Revenue</mat-button-toggle>
+      </mat-button-toggle-group>
+    </header>
+    @defer (on viewport; prefetch on idle) {
+    <rp-top-dishes-chart [dishes]="topDishes()" [mode]="topMode()" />
     } @placeholder {
     <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
     } @loading (minimum 100ms) {

@@ -13,11 +13,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {
   ANALYTICS_MAX_RANGE_DAYS,
   RevenueDayRow,
-  RevenueResponse,
   RevenueTotals,
+  TopDishRow,
 } from '@restaurant-platform/shared-types';
 import {
   AnalyticsRangeInput,
@@ -30,6 +31,7 @@ import {
   startOfUtcDay,
 } from './range-utils';
 import { RevenueChart } from './revenue-chart';
+import { TopDishesChart, TopDishesMode } from './top-dishes-chart';
 
 interface DateRangeForm {
   start: FormControl<Date | null>;
@@ -54,7 +56,9 @@ const ZERO_TOTALS: RevenueTotals = {
     MatFormFieldModule,
     MatInputModule,
     MatProgressBarModule,
+    MatButtonToggleModule,
     RevenueChart,
+    TopDishesChart,
   ],
   templateUrl: './admin-dashboard-page.html',
   styleUrl: './admin-dashboard-page.scss',
@@ -77,9 +81,14 @@ export class AdminDashboardPage {
   );
 
   protected readonly revenueRes = this.analytics.revenue(this.range);
+  protected readonly topDishesRes = this.analytics.topDishes(this.range);
 
-  protected readonly isLoading = this.revenueRes.isLoading;
-  protected readonly hasError = computed(() => !!this.revenueRes.error());
+  protected readonly isLoading = computed(
+    () => this.revenueRes.isLoading() || this.topDishesRes.isLoading()
+  );
+  protected readonly hasError = computed(
+    () => !!this.revenueRes.error() || !!this.topDishesRes.error()
+  );
 
   protected readonly totals: Signal<RevenueTotals> = computed(
     () => this.revenueRes.value()?.totals ?? ZERO_TOTALS
@@ -92,12 +101,15 @@ export class AdminDashboardPage {
     () => this.totals().conversionRate
   );
 
-  protected readonly response: Signal<RevenueResponse | undefined> =
-    this.revenueRes.value;
-
   protected readonly days: Signal<RevenueDayRow[]> = computed(
     () => this.revenueRes.value()?.days ?? []
   );
+
+  protected readonly topDishes: Signal<TopDishRow[]> = computed(
+    () => this.topDishesRes.value()?.dishes ?? []
+  );
+
+  protected readonly topMode = signal<TopDishesMode>('count');
 
   constructor() {
     this.rangeForm.valueChanges
