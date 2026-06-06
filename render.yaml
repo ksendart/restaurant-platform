@@ -22,7 +22,7 @@ services:
       - key: COOKIE_DOMAIN
         sync: false
       - key: WEB_ORIGIN
-        value: https://restaurant-platform-web.onrender.com
+        value: https://restaurant-platform-web-47vd.onrender.com
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD
