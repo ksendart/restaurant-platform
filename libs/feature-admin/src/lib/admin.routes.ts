@@ -22,6 +22,14 @@ export const adminRoutes: Route[] = [
         redirectTo: 'orders',
       },
       {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./admin-dashboard-page/admin-dashboard-page').then(
+            (m) => m.AdminDashboardPage
+          ),
+        title: 'Admin dashboard',
+      },
+      {
         path: 'orders',
         loadComponent: () =>
           import('./admin-orders-page/admin-orders-page').then(
