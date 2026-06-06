@@ -15,6 +15,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ANALYTICS_MAX_RANGE_DAYS,
+  RevenueDayRow,
   RevenueResponse,
   RevenueTotals,
 } from '@restaurant-platform/shared-types';
@@ -28,6 +29,7 @@ import {
   endOfUtcDay,
   startOfUtcDay,
 } from './range-utils';
+import { RevenueChart } from './revenue-chart';
 
 interface DateRangeForm {
   start: FormControl<Date | null>;
@@ -52,6 +54,7 @@ const ZERO_TOTALS: RevenueTotals = {
     MatFormFieldModule,
     MatInputModule,
     MatProgressBarModule,
+    RevenueChart,
   ],
   templateUrl: './admin-dashboard-page.html',
   styleUrl: './admin-dashboard-page.scss',
@@ -91,6 +94,10 @@ export class AdminDashboardPage {
 
   protected readonly response: Signal<RevenueResponse | undefined> =
     this.revenueRes.value;
+
+  protected readonly days: Signal<RevenueDayRow[]> = computed(
+    () => this.revenueRes.value()?.days ?? []
+  );
 
   constructor() {
     this.rangeForm.valueChanges

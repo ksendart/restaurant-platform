@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { AdminSseClient } from '@restaurant-platform/data-access-sse';
 import { AdminMenuStore, AdminOrdersStore } from '@restaurant-platform/state';
 import { AdminLayout } from './admin-layout/admin-layout';
@@ -28,7 +29,10 @@ export const adminRoutes: Route[] = [
           import('./admin-dashboard-page/admin-dashboard-page').then(
             (m) => m.AdminDashboardPage
           ),
-        providers: [provideNativeDateAdapter()],
+        providers: [
+          provideNativeDateAdapter(),
+          provideCharts(withDefaultRegisterables()),
+        ],
         title: 'Admin dashboard',
       },
       {

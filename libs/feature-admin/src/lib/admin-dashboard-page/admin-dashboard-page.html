@@ -51,4 +51,15 @@
       </span>
     </article>
   </div>
+
+  <section class="rp-admin-dashboard__panel">
+    <h2 class="rp-admin-dashboard__panel-title">Revenue by day</h2>
+    @defer (on viewport; prefetch on idle) {
+    <rp-revenue-chart [days]="days()" />
+    } @placeholder {
+    <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
+    } @loading (minimum 100ms) {
+    <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
+    }
+  </section>
 </section>
