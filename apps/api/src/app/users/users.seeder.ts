@@ -5,9 +5,33 @@ import { UsersService } from './users.service';
 
 const BCRYPT_ROUNDS = 10;
 
+interface CustomerSeed {
+  email: string;
+  password: string;
+  name: string;
+}
+
+const CUSTOMER_SEEDS: CustomerSeed[] = [
+  {
+    email: 'customer1@local.test',
+    password: 'Customer12345!',
+    name: 'Alice',
+  },
+  {
+    email: 'customer2@local.test',
+    password: 'Customer12345!',
+    name: 'Bob',
+  },
+  {
+    email: 'customer3@local.test',
+    password: 'Customer12345!',
+    name: 'Carol',
+  },
+];
+
 @Injectable()
-export class AdminSeedService implements OnApplicationBootstrap {
-  private readonly logger = new Logger(AdminSeedService.name);
+export class UsersSeeder implements OnApplicationBootstrap {
+  private readonly logger = new Logger(UsersSeeder.name);
 
   constructor(
     private readonly usersService: UsersService,
@@ -15,6 +39,11 @@ export class AdminSeedService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    await this.seedAdmin();
+    await this.seedCustomers();
+  }
+
+  private async seedAdmin(): Promise<void> {
     const email = this.configService.get<string>('ADMIN_EMAIL')?.trim();
     const password = this.configService.get<string>('ADMIN_PASSWORD');
 
@@ -45,5 +74,22 @@ export class AdminSeedService implements OnApplicationBootstrap {
       name: 'Admin',
     });
     this.logger.log(`Admin seeded (${email})`);
+  }
+
+  private async seedCustomers(): Promise<void> {
+    for (const seed of CUSTOMER_SEEDS) {
+      const existing = await this.usersService.findByEmail(seed.email);
+      if (existing) {
+        continue;
+      }
+      const passwordHash = await bcrypt.hash(seed.password, BCRYPT_ROUNDS);
+      await this.usersService.create({
+        email: seed.email,
+        passwordHash,
+        role: 'customer',
+        name: seed.name,
+      });
+      this.logger.log(`Customer seeded (${seed.email})`);
+    }
   }
 }

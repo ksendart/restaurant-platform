@@ -1,9 +1,9 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { OrderStatus } from '@restaurant-platform/shared-types';
 import { Dish, DishDocument } from '../menu/dish.schema';
+import { UserDocument } from '../users/user.schema';
 import { UsersService } from '../users/users.service';
 import { Order } from './order.schema';
 
@@ -18,6 +18,12 @@ const STATUS_DISTRIBUTION: Array<{ status: OrderStatus; weight: number }> = [
   { status: 'pending', weight: 5 },
 ];
 
+const CUSTOMER_EMAILS = [
+  'customer1@local.test',
+  'customer2@local.test',
+  'customer3@local.test',
+];
+
 @Injectable()
 export class OrderSeeder implements OnApplicationBootstrap {
   private readonly logger = new Logger(OrderSeeder.name);
@@ -25,8 +31,7 @@ export class OrderSeeder implements OnApplicationBootstrap {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     @InjectModel(Dish.name) private readonly dishModel: Model<DishDocument>,
-    private readonly usersService: UsersService,
-    private readonly configService: ConfigService
+    private readonly usersService: UsersService
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -38,15 +43,10 @@ export class OrderSeeder implements OnApplicationBootstrap {
       return;
     }
 
-    const adminEmail = this.configService.get<string>('ADMIN_EMAIL')?.trim();
-    if (!adminEmail) {
-      this.logger.warn('Orders seed skipped: ADMIN_EMAIL not set');
-      return;
-    }
-    const admin = await this.usersService.findByEmail(adminEmail);
-    if (!admin) {
+    const customers = await this.loadCustomers();
+    if (customers.length === 0) {
       this.logger.warn(
-        `Orders seed skipped: admin user ${adminEmail} not found`
+        'Orders seed skipped: no customer users found (expected customer1..3@local.test)'
       );
       return;
     }
@@ -61,10 +61,19 @@ export class OrderSeeder implements OnApplicationBootstrap {
     }
 
     const rng = createSeededRng(0xc0ffee);
-    const docs = generateOrders(rng, dishes, String(admin._id));
+    const docs = generateOrders(rng, dishes, customers);
 
     await this.orderModel.insertMany(docs);
-    this.logger.log(`Seeded ${docs.length} orders across ${SEED_DAYS} days.`);
+    this.logger.log(
+      `Seeded ${docs.length} orders across ${SEED_DAYS} days for ${customers.length} customers.`
+    );
+  }
+
+  private async loadCustomers(): Promise<UserDocument[]> {
+    const found = await Promise.all(
+      CUSTOMER_EMAILS.map((email) => this.usersService.findByEmail(email))
+    );
+    return found.filter((u): u is UserDocument => u !== null);
   }
 }
 
@@ -90,12 +99,11 @@ function generateOrders(
     name: string;
     price: number;
   }>,
-  userId: string
+  customers: UserDocument[]
 ): OrderDoc[] {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  const userObjectId = new Types.ObjectId(userId);
   const orders: OrderDoc[] = [];
 
   for (let dayOffset = SEED_DAYS - 1; dayOffset >= 0; dayOffset--) {
@@ -104,6 +112,8 @@ function generateOrders(
       Math.floor(rng() * (ORDERS_PER_DAY_MAX - ORDERS_PER_DAY_MIN + 1));
 
     for (let i = 0; i < ordersToday; i++) {
+      const customer = customers[Math.floor(rng() * customers.length)];
+
       const itemsCount = 1 + Math.floor(rng() * 3);
       const items: OrderDoc['items'] = [];
       for (let j = 0; j < itemsCount; j++) {
@@ -126,12 +136,12 @@ function generateOrders(
       createdAt.setUTCMinutes(Math.floor(rng() * 60));
 
       orders.push({
-        userId: userObjectId,
+        userId: new Types.ObjectId(String(customer._id)),
         items,
         contact: {
-          name: 'Seed Customer',
+          name: customer.name ?? 'Customer',
           phone: '+1234567',
-          email: 'seed@example.com',
+          email: customer.email,
         },
         pickupSlot: '13:00',
         total,

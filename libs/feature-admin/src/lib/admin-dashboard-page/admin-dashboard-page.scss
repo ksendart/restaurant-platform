@@ -6,13 +6,60 @@
 
   &__header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
 
     h1 {
       margin: 0;
       font-size: 1.5rem;
       font-weight: 500;
     }
+  }
+
+  &__range {
+    min-width: 260px;
+  }
+
+  &__error {
+    color: var(--mat-sys-error, #b3261e);
+    margin: 0;
+  }
+
+  &__kpi {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__kpi-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: var(--mat-sys-surface-container, #f3f3f7);
+  }
+
+  &__kpi-label {
+    font-size: 0.85rem;
+    color: var(--mat-sys-on-surface-variant, #5a5a66);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__kpi-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1;
   }
 }
