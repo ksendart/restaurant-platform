@@ -1,0 +1,91 @@
+<section class="rp-admin-dashboard">
+  <header class="rp-admin-dashboard__header">
+    <h1>Dashboard</h1>
+
+    <mat-form-field appearance="outline" class="rp-admin-dashboard__range">
+      <mat-label>Date range</mat-label>
+      <mat-date-range-input
+        [formGroup]="rangeForm"
+        [rangePicker]="picker"
+        [max]="maxDate"
+      >
+        <input matStartDate formControlName="start" placeholder="Start" />
+        <input matEndDate formControlName="end" placeholder="End" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-date-range-picker #picker />
+      @if (rangeError(); as err) {
+      <mat-error>{{ err }}</mat-error>
+      }
+    </mat-form-field>
+  </header>
+
+  @if (isLoading()) {
+  <mat-progress-bar mode="indeterminate" />
+  } @if (hasError()) {
+  <p class="rp-admin-dashboard__error">Failed to load analytics.</p>
+  }
+
+  <div class="rp-admin-dashboard__kpi">
+    <article class="rp-admin-dashboard__kpi-card">
+      <span class="rp-admin-dashboard__kpi-label">Revenue</span>
+      <span class="rp-admin-dashboard__kpi-value">
+        {{ revenueValue() | currency: 'USD' : 'symbol' : '1.0-2' }}
+      </span>
+    </article>
+
+    <article class="rp-admin-dashboard__kpi-card">
+      <span class="rp-admin-dashboard__kpi-label">Orders</span>
+      <span class="rp-admin-dashboard__kpi-value">
+        {{ ordersCount() | number }}
+      </span>
+    </article>
+
+    <article class="rp-admin-dashboard__kpi-card">
+      <span class="rp-admin-dashboard__kpi-label">Avg check</span>
+      <span class="rp-admin-dashboard__kpi-value">
+        {{ avgCheck() | currency: 'USD' : 'symbol' : '1.0-2' }}
+      </span>
+    </article>
+
+    <article class="rp-admin-dashboard__kpi-card">
+      <span class="rp-admin-dashboard__kpi-label">Conversion</span>
+      <span class="rp-admin-dashboard__kpi-value">
+        {{ conversionRate() | percent: '1.0-1' }}
+      </span>
+    </article>
+  </div>
+
+  <section class="rp-admin-dashboard__panel">
+    <h2 class="rp-admin-dashboard__panel-title">Revenue by day</h2>
+    @defer (on viewport; prefetch on idle) {
+    <rp-revenue-chart [days]="days()" />
+    } @placeholder {
+    <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
+    } @loading (minimum 100ms) {
+    <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
+    }
+  </section>
+
+  <section class="rp-admin-dashboard__panel">
+    <header class="rp-admin-dashboard__panel-header">
+      <h2 class="rp-admin-dashboard__panel-title">Top dishes</h2>
+      <mat-button-toggle-group
+        hideSingleSelectionIndicator
+        [value]="topMode()"
+        (change)="topMode.set($event.value)"
+        aria-label="Top dishes metric"
+      >
+        <mat-button-toggle value="count">Quantity</mat-button-toggle>
+        <mat-button-toggle value="revenue">Revenue</mat-button-toggle>
+      </mat-button-toggle-group>
+    </header>
+    @defer (on viewport; prefetch on idle) {
+    <rp-top-dishes-chart [dishes]="topDishes()" [mode]="topMode()" />
+    } @placeholder {
+    <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
+    } @loading (minimum 100ms) {
+    <div class="rp-admin-dashboard__chart-placeholder" aria-hidden="true"></div>
+    }
+  </section>
+</section>

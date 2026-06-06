@@ -16,6 +16,16 @@
     <nav class="rp-admin__nav" aria-label="Admin navigation">
       <a
         class="rp-admin__nav-link"
+        routerLink="/admin/dashboard"
+        routerLinkActive="rp-admin__nav-link--active"
+        (click)="closeSidenavOnMobile()"
+      >
+        <mat-icon fontSet="material-symbols-outlined">dashboard</mat-icon>
+        <span class="rp-admin__nav-label">Dashboard</span>
+      </a>
+
+      <a
+        class="rp-admin__nav-link"
         routerLink="/admin/orders"
         routerLinkActive="rp-admin__nav-link--active"
         (click)="closeSidenavOnMobile()"

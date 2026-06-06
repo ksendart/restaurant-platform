@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@restaurant-platform/data-access-analytics": [
+        "libs/data-access/analytics/src/index.ts"
+      ],
       "@restaurant-platform/data-access-auth": [
         "libs/data-access/auth/src/index.ts"
       ],
