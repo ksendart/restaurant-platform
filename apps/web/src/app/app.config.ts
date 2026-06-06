@@ -23,7 +23,9 @@ import {
   withEventReplay,
   withIncrementalHydration,
 } from '@angular/platform-browser';
+import { API_BASE_URL } from '@restaurant-platform/data-access-config';
 import { AuthStore } from '@restaurant-platform/state';
+import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
 import { authInterceptor } from './shared/interceptors/auth.interceptor';
 import { errorInterceptor } from './shared/interceptors/error.interceptor';
@@ -41,6 +43,7 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([authInterceptor, errorInterceptor])
     ),
+    { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
     provideAppInitializer(async () => {
       if (!isPlatformBrowser(inject(PLATFORM_ID))) {
         return;

@@ -1,13 +1,15 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { OrderStatus } from '@restaurant-platform/shared-types';
+import { isSeedEnabled } from '../common/seed-enabled';
 import { Dish, DishDocument } from '../menu/dish.schema';
 import { UserDocument } from '../users/user.schema';
 import { UsersService } from '../users/users.service';
 import { Order } from './order.schema';
 
-const SEED_DAYS = 14;
+const SEED_DAYS = 90;
 const ORDERS_PER_DAY_MIN = 2;
 const ORDERS_PER_DAY_MAX = 6;
 const STATUS_DISTRIBUTION: Array<{ status: OrderStatus; weight: number }> = [
@@ -31,10 +33,17 @@ export class OrderSeeder implements OnApplicationBootstrap {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     @InjectModel(Dish.name) private readonly dishModel: Model<DishDocument>,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly configService: ConfigService
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    if (!isSeedEnabled(this.configService)) {
+      this.logger.log(
+        'Seeding disabled (SEED_ENABLED=false), skipping orders.'
+      );
+      return;
+    }
     const existing = await this.orderModel.estimatedDocumentCount();
     if (existing > 0) {
       this.logger.log(

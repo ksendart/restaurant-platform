@@ -82,17 +82,18 @@ export class AuthController {
 
   private setAuthCookies(res: Response, tokens: AuthTokens): void {
     const isProd = this.configService.get<string>('NODE_ENV') === 'production';
+    const sameSite = isProd ? 'none' : 'strict';
     res.cookie(REFRESH_COOKIE, tokens.refreshToken, {
       httpOnly: true,
       secure: isProd,
-      sameSite: 'strict',
+      sameSite,
       path: REFRESH_COOKIE_PATH,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.cookie(ACCESS_COOKIE, tokens.accessToken, {
       httpOnly: true,
       secure: isProd,
-      sameSite: 'strict',
+      sameSite,
       path: ACCESS_COOKIE_PATH,
       maxAge: this.accessTtlMs(),
     });

@@ -1,7 +1,9 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { DishCategory } from '@restaurant-platform/shared-types';
+import { isSeedEnabled } from '../common/seed-enabled';
 import { Dish } from './dish.schema';
 
 type DishSeed = {
@@ -165,10 +167,17 @@ export class DishSeeder implements OnApplicationBootstrap {
   private readonly logger = new Logger(DishSeeder.name);
 
   constructor(
-    @InjectModel(Dish.name) private readonly dishModel: Model<Dish>
+    @InjectModel(Dish.name) private readonly dishModel: Model<Dish>,
+    private readonly configService: ConfigService
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    if (!isSeedEnabled(this.configService)) {
+      this.logger.log(
+        'Seeding disabled (SEED_ENABLED=false), skipping dishes.'
+      );
+      return;
+    }
     const existing = await this.dishModel.estimatedDocumentCount();
     if (existing > 0) {
       this.logger.log(

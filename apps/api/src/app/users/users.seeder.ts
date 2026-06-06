@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { isSeedEnabled } from '../common/seed-enabled';
 import { UsersService } from './users.service';
 
 const BCRYPT_ROUNDS = 10;
@@ -39,6 +40,10 @@ export class UsersSeeder implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    if (!isSeedEnabled(this.configService)) {
+      this.logger.log('Seeding disabled (SEED_ENABLED=false), skipping users.');
+      return;
+    }
     await this.seedAdmin();
     await this.seedCustomers();
   }

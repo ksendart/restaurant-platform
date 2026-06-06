@@ -21,6 +21,9 @@
       "@restaurant-platform/data-access-auth": [
         "libs/data-access/auth/src/index.ts"
       ],
+      "@restaurant-platform/data-access-config": [
+        "libs/data-access/config/src/index.ts"
+      ],
       "@restaurant-platform/data-access-menu": [
         "libs/data-access/menu/src/index.ts"
       ],

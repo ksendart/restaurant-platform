@@ -1,9 +1,10 @@
 import { httpResource } from '@angular/common/http';
-import { Injectable, Signal } from '@angular/core';
+import { Injectable, Signal, inject } from '@angular/core';
 import {
   RevenueResponse,
   TopDishesResponse,
 } from '@restaurant-platform/shared-types';
+import { API_BASE_URL } from '@restaurant-platform/data-access-config';
 
 export interface AnalyticsRangeInput {
   from: string;
@@ -12,12 +13,14 @@ export interface AnalyticsRangeInput {
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
+  private readonly apiBase = inject(API_BASE_URL);
+
   revenue(range: Signal<AnalyticsRangeInput | null>) {
     return httpResource<RevenueResponse | undefined>(() => {
       const r = range();
       return r
         ? {
-            url: '/api/admin/analytics/revenue',
+            url: `${this.apiBase}/api/admin/analytics/revenue`,
             params: { from: r.from, to: r.to },
           }
         : undefined;
@@ -29,7 +32,7 @@ export class AnalyticsService {
       const r = range();
       return r
         ? {
-            url: '/api/admin/analytics/top-dishes',
+            url: `${this.apiBase}/api/admin/analytics/top-dishes`,
             params: { from: r.from, to: r.to },
           }
         : undefined;

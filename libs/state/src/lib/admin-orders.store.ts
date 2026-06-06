@@ -17,6 +17,7 @@ import {
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { withDevtools } from '@angular-architects/ngrx-toolkit';
+import { API_BASE_URL } from '@restaurant-platform/data-access-config';
 import { AdminOrdersApi } from '@restaurant-platform/data-access-orders';
 import {
   AdminSseClient,
@@ -57,7 +58,7 @@ const initialState: AdminOrdersState = {
 
 const SSE_RECONNECT_GRACE_MS = 3_000;
 const FRESH_HIGHLIGHT_MS = 8_000;
-const SSE_URL = '/api/admin/orders/stream';
+const SSE_PATH = '/api/admin/orders/stream';
 
 const orderEntity = entityConfig({
   entity: type<OrderDto>(),
@@ -93,8 +94,10 @@ export const AdminOrdersStore = signalStore(
       adminOrdersApi = inject(AdminOrdersApi),
       sseClient = inject(AdminSseClient),
       authStore = inject(AuthStore),
-      injector = inject(Injector)
+      injector = inject(Injector),
+      apiBase = inject(API_BASE_URL)
     ) => {
+      const sseUrl = `${apiBase}${SSE_PATH}`;
       const loadAll = rxMethod<void>(
         pipe(
           tap(() => patchState(store, { status: 'loading', lastError: null })),
@@ -157,7 +160,7 @@ export const AdminOrdersStore = signalStore(
           filter(() => authStore.isAdmin()),
           switchMap(() =>
             authStore.refresh().pipe(
-              tap(() => sseClient.connect(SSE_URL)),
+              tap(() => sseClient.connect(sseUrl)),
               catchError(() => EMPTY)
             )
           )
@@ -165,7 +168,7 @@ export const AdminOrdersStore = signalStore(
       );
 
       function startStream(): void {
-        sseClient.connect(SSE_URL);
+        sseClient.connect(sseUrl);
         subscribeToStream(sseClient.messages$, { injector });
         trackConnection(sseClient.status$, { injector });
       }

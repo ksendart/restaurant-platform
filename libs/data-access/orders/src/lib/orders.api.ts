@@ -5,20 +5,22 @@ import {
   CreateOrderRequest,
   OrderDto,
 } from '@restaurant-platform/shared-types';
+import { API_BASE_URL } from '@restaurant-platform/data-access-config';
 
 @Injectable({ providedIn: 'root' })
 export class OrdersApi {
   private readonly http = inject(HttpClient);
+  private readonly apiBase = inject(API_BASE_URL);
 
   create(body: CreateOrderRequest): Observable<OrderDto> {
-    return this.http.post<OrderDto>('/api/orders', body);
+    return this.http.post<OrderDto>(`${this.apiBase}/api/orders`, body);
   }
 
   list(): Observable<OrderDto[]> {
-    return this.http.get<OrderDto[]>('/api/orders');
+    return this.http.get<OrderDto[]>(`${this.apiBase}/api/orders`);
   }
 
   getById(id: string): Observable<OrderDto> {
-    return this.http.get<OrderDto>(`/api/orders/${id}`);
+    return this.http.get<OrderDto>(`${this.apiBase}/api/orders/${id}`);
   }
 }
