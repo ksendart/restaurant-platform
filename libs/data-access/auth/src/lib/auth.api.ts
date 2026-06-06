@@ -6,26 +6,36 @@ import {
   LoginRequest,
   RegisterRequest,
 } from '@restaurant-platform/shared-types';
+import { API_BASE_URL } from '@restaurant-platform/data-access-config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthApi {
   private readonly http = inject(HttpClient);
+  private readonly apiBase = inject(API_BASE_URL);
 
   login(body: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/login', body, {
-      withCredentials: true,
-    });
+    return this.http.post<AuthResponse>(
+      `${this.apiBase}/api/auth/login`,
+      body,
+      {
+        withCredentials: true,
+      }
+    );
   }
 
   register(body: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/register', body, {
-      withCredentials: true,
-    });
+    return this.http.post<AuthResponse>(
+      `${this.apiBase}/api/auth/register`,
+      body,
+      {
+        withCredentials: true,
+      }
+    );
   }
 
   refresh(): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
-      '/api/auth/refresh',
+      `${this.apiBase}/api/auth/refresh`,
       {},
       { withCredentials: true }
     );
@@ -33,7 +43,7 @@ export class AuthApi {
 
   logout(accessToken?: string): Observable<void> {
     return this.http.post<void>(
-      '/api/auth/logout',
+      `${this.apiBase}/api/auth/logout`,
       {},
       {
         withCredentials: true,
