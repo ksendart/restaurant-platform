@@ -201,7 +201,7 @@ describe('AdminAnalyticsService', () => {
   });
 
   describe('getTopDishes', () => {
-    it('returns count and revenue per dish, sorted by count desc', async () => {
+    it('returns count and revenue per dish, sorted by count desc then name asc', async () => {
       await orderModel.insertMany([
         seedOrder({
           total: 1500,
@@ -259,16 +259,16 @@ describe('AdminAnalyticsService', () => {
           revenue: 1500,
         },
         {
-          dishId: String(dishPepperoni),
-          name: 'Pepperoni',
-          count: 1,
-          revenue: 600,
-        },
-        {
           dishId: String(dishHawaiian),
           name: 'Hawaiian',
           count: 1,
           revenue: 700,
+        },
+        {
+          dishId: String(dishPepperoni),
+          name: 'Pepperoni',
+          count: 1,
+          revenue: 600,
         },
       ]);
     });

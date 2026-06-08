@@ -111,7 +111,7 @@ export class AdminAnalyticsService {
           },
         },
       },
-      { $sort: { count: -1 } },
+      { $sort: { count: -1, name: 1 } },
       { $limit: limit },
     ]);
 
